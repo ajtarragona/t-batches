@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Ajtarragona\\TID\\": "./src"
+            "Ajtarragona\\TJobs\\": "./src"
         }
     },
     "extra": {
@@ -27,7 +27,7 @@
                 "Ajtarragona\\TJobs\\JobsServiceProvider"
             ],
             "aliases": {
-                "TID" : "Ajtarragona\\TJobs\\Facades\\TJobsFacade"
+                "TJobs" : "Ajtarragona\\TJobs\\Facades\\TJobsFacade"
             }
         }
     }
