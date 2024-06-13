@@ -24,7 +24,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Ajtarragona\\TJobs\\JobsServiceProvider"
+                "Ajtarragona\\TJobs\\TJobsServiceProvider"
             ],
             "aliases": {
                 "TJobs" : "Ajtarragona\\TJobs\\Facades\\TJobsFacade"

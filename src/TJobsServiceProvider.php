@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 
 
-class JobsServiceProvider extends ServiceProvider
+class TJobsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap services.
