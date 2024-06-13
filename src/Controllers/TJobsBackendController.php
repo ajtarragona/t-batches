@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 class TJobsBackendController extends Controller
 {
     public function login(){
+        Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
         return view("tgn-jobs::pass");
     }
 
@@ -30,11 +31,11 @@ class TJobsBackendController extends Controller
     
     public function home(){
         
-        Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
+        // Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
         
         $args=[];
         
-        return view("tgn-jobs::backend", $args);
+        return view("tgn-jobs::welcome", $args);
     }
 
     

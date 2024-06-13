@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('tgn-jobs::layout')
 
 @section('title')
 	Backend 
