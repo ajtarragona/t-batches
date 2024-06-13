@@ -5,11 +5,14 @@ namespace Ajtarragona\TJobs;
 use Ajtarragona\TJobs\Commands\PrepareJs;
 use Ajtarragona\TJobs\Commands\RunTJob;
 use Illuminate\Support\ServiceProvider;
-
+use Ajtarragona\TJobs\Traits\PublishesMigrations;
 
 
 class TJobsServiceProvider extends ServiceProvider
 {
+
+    use PublishesMigrations;
+
     /**
      * Bootstrap services.
      *
@@ -49,6 +52,9 @@ class TJobsServiceProvider extends ServiceProvider
         ], 'tgn-jobs-assets');
 
         $this->registerCommands();
+
+
+        $this->registerMigrations(__DIR__.'/database/migrations', 'tgn-jobs-migrations');
        
     }
 

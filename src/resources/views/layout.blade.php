@@ -27,9 +27,9 @@
                     </div>
                 </div>
                 <div class="col-sm-10 h-100 bg-secondary  bg-opacity-10">
-                    <div class="h-100 ">
+                    <div class="h-100 " style="overflow-y: auto">
                         
-                        contingut
+                        
                         @yield('body')
 
                     </div>

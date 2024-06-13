@@ -4,6 +4,7 @@ namespace Ajtarragona\TJobs\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use TJobs;
 
 class TJobsBackendController extends Controller
 {
@@ -32,8 +33,8 @@ class TJobsBackendController extends Controller
     public function home(){
         
         // Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
-        
-        $args=[];
+        $jobs=TJobs::all();
+        $args=compact('jobs');
         
         return view("tgn-jobs::welcome", $args);
     }
