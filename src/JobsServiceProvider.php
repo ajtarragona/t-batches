@@ -5,10 +5,10 @@ namespace Ajtarragona\TJobs;
 use Ajtarragona\TJobs\Commands\PrepareJs;
 use Ajtarragona\TJobs\Commands\RunTJob;
 use Illuminate\Support\ServiceProvider;
-//use Illuminate\Support\Facades\Blade;
-//use Illuminate\Support\Facades\Schema;
 
-class TJobsServiceProvider extends ServiceProvider
+
+
+class JobsServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap services.

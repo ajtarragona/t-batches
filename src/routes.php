@@ -18,8 +18,8 @@ Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language'],
 
 });
 
-Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language','reports-backend'],'as'=>'tgn-jobs.'	], function () {
+Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language','tjobs-backend'],'as'=>'tgn-jobs.'	], function () {
 
-    Route::get('/', 'Ajtarragona\Reports\Controllers\TJobsBackendController@home')->name('home');
+    Route::get('/', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@home')->name('home');
     
 });
