@@ -2,6 +2,7 @@
 
 namespace Ajtarragona\TJobs\Models;
 
+use Ajtarragona\TJobs\Jobs\TJobDispatcher;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -18,20 +19,29 @@ abstract class TJob
     protected $name;
     protected $classname;
     protected $queue = "tjobs-queue";
-    
+    protected $model;
+    protected $autostart=true;
 
-    abstract protected function setup();
+
+    // abstract protected function setup();
 
     public function __construct($options=[]) {
         $this->options=$options;
         if(isset($options["queue"])) $this->queue=$options["queue"];
         $this->classname=get_class($this);
-        $this->name=isset($options["name"])? isset($options["name"]) : Str::slug(Str::snake($this->classname));
+        $this->name= isset($options["name"])? $options["name"] : ($this->name ? $this->name : Str::slug(Str::snake($this->classname)));
         // dd($this);
     }
 
     public function getOption($name, $default=null){
         return data_get($this->options, $name, $default);
+    }
+
+    public function getSteps(){
+        return $this->steps;
+    }
+    public function getModel(){
+        return $this->model;
     }
 
     public function addStep($step, $args=[]){
@@ -76,65 +86,20 @@ abstract class TJob
     
     public function run(){
         // lo creo en BBDD
-
-        $model=TJobModel::create([
+        $this->model=TJobModel::create([
             'queue'=>$this->queue,
             'classname'=>$this->classname,
             'name'=>$this->name,
             'user_id'=>auth()->user()?auth()->user()->id:null,
-            'progress'=>0,
-            'started_at'=>Date::now()
+            'progress'=>0
         ]);
+
         
+        //lanzo en la cola
         if($this->steps){
-            
-            
-
             $this->prepareWeights();
-            // dd($this);
-            try{
-                $progress=0;
-                $error=false;
-                foreach($this->steps as $i=>$step){
-                    $progress = $progress + $step->weight;
-                    if($step->run()){
-                        $model->update([
-                            'progress'=>$progress
-                        ]);
-                    }else{
-                        $error=true;
-                        $model->update([
-                            'failed'=>true,
-                            'finished_at'=>Date::now(),
-                            'trace'=>"Error in step ". $i
-                        ]);
-                        break;
-                    }
-                    
-                }
-                if(!$error){
-                    $model->update([
-                        'progress'=>100,
-                        'finished_at'=>Date::now(),
-                    ]);
-                }
-                
+            TJobDispatcher::dispatch($this)->onQueue($this->queue);
 
-            }catch(Exception $e){
-                $model->update([
-                    'failed'=>true,
-                    'finished_at'=>Date::now(),
-                    'trace'=>$e->getTraceAsString()
-                ]);
-
-                // dd($e);
-                // abort(500,$e->getMessage());
-                // $this->abort($e->getMessage());
-                // echo "\n".json_encode(["progress"=>"100", "message"=>"error"]);
-            }
-            
-            
-           
         }
     }
 

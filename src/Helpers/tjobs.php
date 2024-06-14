@@ -1,8 +1,23 @@
 <?php
 
+use Ajtarragona\TJobs\Facades\TJobsFacade;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+
+if (! function_exists('tJobProgress')) {
+	function tJobProgress($job) {
+		if(!$job instanceof $job){
+			$job=TJobsFacade::find($job);
+		}
+        // dump($this->options["map_position"]);
+        $view='tgn-jobs::_job-progress';
+
+		if(view()->exists($view)){
+            return view($view, ['job'=>$job]);
+		}
+    }
+}
 
 if (! function_exists('c')) {
 	function c($name) {
@@ -56,5 +71,13 @@ if (! function_exists('to_object')) {
 if (! function_exists('to_array')) {
 	function to_array($object) {
 	 	return json_decode(json_encode($object), true);
+	}
+}
+
+
+
+if (!function_exists('json_alpine')) {
+	function json_alpine($ret){
+		return str_replace("\"","'", json_encode( $ret, JSON_HEX_APOS|JSON_HEX_QUOT ));
 	}
 }

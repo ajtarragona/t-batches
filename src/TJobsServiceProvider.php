@@ -6,6 +6,7 @@ use Ajtarragona\TJobs\Commands\PrepareJs;
 use Ajtarragona\TJobs\Commands\RunTJob;
 use Illuminate\Support\ServiceProvider;
 use Ajtarragona\TJobs\Traits\PublishesMigrations;
+use Illuminate\Support\Facades\Blade;
 
 
 class TJobsServiceProvider extends ServiceProvider
@@ -56,6 +57,10 @@ class TJobsServiceProvider extends ServiceProvider
 
         $this->registerMigrations(__DIR__.'/database/migrations', 'tgn-jobs-migrations');
        
+         //registra directiva sortablecomponent
+         Blade::directive('tJobProgress',  function ($expression) {
+            return "<?php echo tJobProgress({$expression}); ?>";
+        });
     }
 
     public function registerCommands()

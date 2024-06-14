@@ -32,7 +32,7 @@ class TJobsBackendController extends Controller
     
     public function home(){
         
-        // Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
+        Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
         $jobs=TJobs::all();
         $args=compact('jobs');
         

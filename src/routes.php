@@ -15,6 +15,7 @@ Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language'],
     Route::get('/login', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@login')->name('login');
     Route::post('/login', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@dologin')->name('dologin');
     Route::get('/logout', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@logout')->name('logout');
+    Route::get('/monitor/{job}', 'Ajtarragona\TJobs\Controllers\TJobsController@monitor')->name('monitor');
 
 });
 
