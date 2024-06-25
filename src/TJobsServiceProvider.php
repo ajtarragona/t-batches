@@ -1,15 +1,15 @@
 <?php
 
-namespace Ajtarragona\TJobs;
+namespace Ajtarragona\TBatches;
 
-use Ajtarragona\TJobs\Commands\PrepareJs;
-use Ajtarragona\TJobs\Commands\RunTJob;
+use Ajtarragona\TBatches\Commands\PrepareJs;
+use Ajtarragona\TBatches\Commands\RunBatch;
 use Illuminate\Support\ServiceProvider;
-use Ajtarragona\TJobs\Traits\PublishesMigrations;
+use Ajtarragona\TBatches\Traits\PublishesMigrations;
 use Illuminate\Support\Facades\Blade;
 
 
-class TJobsServiceProvider extends ServiceProvider
+class TBatchesServiceProvider extends ServiceProvider
 {
 
     use PublishesMigrations;
@@ -23,43 +23,43 @@ class TJobsServiceProvider extends ServiceProvider
     {
         
         //vistas
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'tgn-jobs');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'tgn-batches');
         
         //cargo rutas
         $this->loadRoutesFrom(__DIR__.'/routes.php');
 
         //idiomas
-        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'tgn-jobs');
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'tgn-batches');
 
         $this->publishes([
-            __DIR__.'/resources/lang' => resource_path('lang/vendor/tgn-jobs'),
-        ], 'tgn-jobs-translations');
+            __DIR__.'/resources/lang' => resource_path('lang/vendor/tgn-batches'),
+        ], 'tgn-batches-translations');
 
 
         //publico configuracion
-        $config = __DIR__.'/Config/tjobs.php';
+        $config = __DIR__.'/Config/tbatches.php';
         
         $this->publishes([
-            $config => config_path('tjobs.php'),
-        ], 'tgn-jobs-config');
+            $config => config_path('tbatches.php'),
+        ], 'tgn-batches-config');
 
 
-        $this->mergeConfigFrom($config, 'tjobs');
+        $this->mergeConfigFrom($config, 'tbatches');
 
 
          //publico assets
         $this->publishes([
             __DIR__.'/../public' => public_path('vendor/ajtarragona'),
-        ], 'tgn-jobs-assets');
+        ], 'tgn-batches-assets');
 
         $this->registerCommands();
 
 
-        $this->registerMigrations(__DIR__.'/database/migrations', 'tgn-jobs-migrations');
+        $this->registerMigrations(__DIR__.'/database/migrations', 'tgn-batches-migrations');
        
          //registra directiva sortablecomponent
-         Blade::directive('tJobProgress',  function ($expression) {
-            return "<?php echo tJobProgress({$expression}); ?>";
+         Blade::directive('tBatchProgress',  function ($expression) {
+            return "<?php echo tBatchProgress({$expression}); ?>";
         });
     }
 
@@ -68,7 +68,7 @@ class TJobsServiceProvider extends ServiceProvider
         
         if ($this->app->runningInConsole()) {
             $this->commands([
-                RunTJob::class,
+                RunBatch::class,
                 PrepareJs::class
                 
             ]);
@@ -84,11 +84,11 @@ class TJobsServiceProvider extends ServiceProvider
     {
 
         //registro middleware
-        $this->app['router']->aliasMiddleware('tjobs-backend', \Ajtarragona\TJobs\Middlewares\TJobsBackend::class);
+        $this->app['router']->aliasMiddleware('tbatches-backend', \Ajtarragona\TBatches\Middlewares\TBatchesBackend::class);
 
         //defino facades
-        $this->app->bind('tgn-jobs', function(){
-            return new \Ajtarragona\TJobs\Services\TJobsService;
+        $this->app->bind('tgn-batches', function(){
+            return new \Ajtarragona\TBatches\Services\TBatchesService;
         });
         //helpers
         foreach (glob(__DIR__.'/Helpers/*.php') as $filename){

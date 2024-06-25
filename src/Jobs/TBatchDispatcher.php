@@ -1,6 +1,6 @@
 <?php
 
-namespace Ajtarragona\TJobs\Jobs;
+namespace Ajtarragona\TBatches\Jobs;
 
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Date;
 
-class TJobDispatcher implements ShouldQueue
+class TBatchDispatcher implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

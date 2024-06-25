@@ -1,7 +1,7 @@
 {
-    "name": "ajtarragona/t-jobs",
-    "description": "Queued monitorable jobs for Laravel",
-    "keywords": ["laravel", "queues", "jobs"],
+    "name": "ajtarragona/t-batches",
+    "description": "Queued monitorable batch jobs for Laravel",
+    "keywords": ["laravel", "queues", "jobs","batch"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -18,16 +18,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Ajtarragona\\TJobs\\": "./src"
+            "Ajtarragona\\TBatches\\": "./src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Ajtarragona\\TJobs\\TJobsServiceProvider"
+                "Ajtarragona\\TBatches\\TBatchesServiceProvider"
             ],
             "aliases": {
-                "TJobs" : "Ajtarragona\\TJobs\\Facades\\TJobsFacade"
+                "TBatches" : "Ajtarragona\\TBatches\\Facades\\TBatchesFacade"
             }
         }
     }

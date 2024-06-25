@@ -1,6 +1,6 @@
 {
-  "name": "tjobs",
-  "description": "Queued monitorable jobs for Laravel",
+  "name": "tbatches",
+  "description": "Queued monitorable batch jobs for Laravel",
   "main": "index.js",
   "scripts": {
     "dev": "npm run development",

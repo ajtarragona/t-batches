@@ -1,14 +1,14 @@
 <?php
 
-namespace Ajtarragona\TJobs\Models;
+namespace Ajtarragona\TBatches\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Date;
 
-class TJobModel extends Model
+class TBatchModel extends Model
 {
-    public $table = 'tjobs';
+    public $table = 'batches';
 
 	public static $perpage = 10;
    

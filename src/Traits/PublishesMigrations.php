@@ -1,6 +1,6 @@
 <?php
 
-namespace Ajtarragona\TJobs\Traits;
+namespace Ajtarragona\TBatches\Traits;
 
 use Generator;
 use Illuminate\Support\Str;

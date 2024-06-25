@@ -8,9 +8,9 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>TGN Jobs - @yield('title') </title>
+        <title>TGN Batches - @yield('title') </title>
 
-        <link href="{{ asset('vendor/ajtarragona/css/tjobs.css') }}" rel="stylesheet">
+        <link href="{{ asset('vendor/ajtarragona/css/tbatches.css') }}" rel="stylesheet">
         
         @yield('css')
 	    @yield('meta')
@@ -23,7 +23,7 @@
             <div class="row g-0 h-100">
                 <div class="col-sm-2   " >
                     <div class="h-100 border-end" style="overflow-y: auto">
-                        Menú
+                        {{-- Menú --}}
                     </div>
                 </div>
                 <div class="col-sm-10 h-100 bg-secondary  bg-opacity-10">
@@ -38,7 +38,7 @@
         </div>
 
         @yield('pre-js')
-        <script src="{{ asset('vendor/ajtarragona/js/tjobs.js')}}" language="JavaScript"></script>
+        <script src="{{ asset('vendor/ajtarragona/js/tbatches.js')}}" language="JavaScript"></script>
         @yield('js')
         
     </body>

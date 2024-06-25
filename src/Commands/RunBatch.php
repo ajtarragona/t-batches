@@ -1,13 +1,13 @@
 <?php
 
-namespace Ajtarragona\TJobs\Commands;
+namespace Ajtarragona\TBatches\Commands;
 
 use Illuminate\Console\Command;
 
 use \Artisan;
 use Illuminate\Support\Facades\File;  
 
-class RunTJob extends Command
+class RunBatch extends Command
 {
     
     /**
@@ -15,14 +15,14 @@ class RunTJob extends Command
      *
      * @var string
      */
-    protected $signature = 'ajtarragona:jobs:run';
+    protected $signature = 'ajtarragona:batch:run';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Run a specific job';
+    protected $description = 'Run a specific batch';
 
 
     

@@ -1,4 +1,4 @@
-@extends('tgn-jobs::layout')
+@extends('tgn-batches::layout')
 
 @section('title')
 	Backend 
@@ -24,20 +24,20 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach($jobs as $job)
+		@foreach($batches as $batch)
 			<tr>
-				<td >{{$job->id}}</td>
-				<td class="text-nowrap">{{$job->name}}</td>
-				{{-- <td>{{$job->classname}}</td> --}}
-				<td class="text-nowrap"><span class="badge bg-dark text-bg-dark"><i class="bi bi-gear-wide"></i> {{$job->queue}}</span></td>
+				<td >{{$batch->id}}</td>
+				<td class="text-nowrap">{{$batch->name}}</td>
+				{{-- <td>{{$batch->classname}}</td> --}}
+				<td class="text-nowrap"><span class="badge bg-dark text-bg-dark"><i class="bi bi-gear-wide"></i> {{$batch->queue}}</span></td>
 				<td class="w-50">
-					@tJobProgress($job)
+					@tBatchProgress($batch)
 				</td>
-				<td>{{$job->user_id}}</td>
-				<td class="text-nowrap"><small class="text-muted">{{$job->created_at}}</small></td>
-				<td class="text-nowrap"><small class="text-muted">{{$job->started_at}}</small></td>
-				<td class="text-nowrap"><small class="text-muted">{{$job->finished_at}}</small></td>
-				<td>@if($job->failed)<i class="bi bi-exclamation-circle-fill text-danger"></i>@endif</td>
+				<td>{{$batch->user_id}}</td>
+				<td class="text-nowrap"><small class="text-muted">{{$batch->created_at}}</small></td>
+				<td class="text-nowrap"><small class="text-muted">{{$batch->started_at}}</small></td>
+				<td class="text-nowrap"><small class="text-muted">{{$batch->finished_at}}</small></td>
+				<td>@if($batch->failed)<i class="bi bi-exclamation-circle-fill text-danger"></i>@endif</td>
 				
 			</tr>
 

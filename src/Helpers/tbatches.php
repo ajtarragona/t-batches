@@ -1,14 +1,14 @@
 <?php
 
-use Ajtarragona\TJobs\Facades\TJobsFacade;
+use Ajtarragona\TBatches\Facades\TBatchesFacade;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
-if (! function_exists('tJobProgress')) {
-	function tJobProgress($job) {
+if (! function_exists('tBatchProgress')) {
+	function tBatchProgress($job) {
 		if(!$job instanceof $job){
-			$job=TJobsFacade::find($job);
+			$job=TBatchesFacade::find($job);
 		}
         // dump($this->options["map_position"]);
         $view='tgn-jobs::_job-progress';

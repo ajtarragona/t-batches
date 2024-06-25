@@ -1,10 +1,10 @@
 <?php
 
-namespace Ajtarragona\TJobs\Middlewares;
+namespace Ajtarragona\TBatches\Middlewares;
 
 use Closure;
 
-class TJobsBackend
+class TBatchesBackend
 {
     /**
      * Handle an incoming request.
@@ -15,13 +15,13 @@ class TJobsBackend
      */
     public function handle($request, Closure $next)
     {
-    	if (!config("tjobs.backend")) {
-    		 abort(403, "Oops! Jobs backend is disabled");
+    	if (!config("tbatches.backend")) {
+    		 abort(403, "Oops! Batches backend is disabled");
         }else{
-            if(session()->has('tjobs_login')){
+            if(session()->has('tbatches_login')){
                 return $next($request);
             }else{
-                return redirect()->route('tgn-jobs.login');
+                return redirect()->route('tgn-batches.login');
             }
         }
 

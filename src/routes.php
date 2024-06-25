@@ -11,16 +11,16 @@
 |
 */
 
-Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language'],'as'=>'tgn-jobs.'	], function () {
-    Route::get('/login', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@login')->name('login');
-    Route::post('/login', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@dologin')->name('dologin');
-    Route::get('/logout', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@logout')->name('logout');
-    Route::get('/monitor/{job}', 'Ajtarragona\TJobs\Controllers\TJobsController@monitor')->name('monitor');
+Route::group(['prefix' => 'ajtarragona/batches','middleware' => ['web','language'],'as'=>'tgn-batches.'	], function () {
+    Route::get('/login', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@login')->name('login');
+    Route::post('/login', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@dologin')->name('dologin');
+    Route::get('/logout', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@logout')->name('logout');
+    Route::get('/monitor/{batch}', 'Ajtarragona\TBatches\Controllers\TBatchesController@monitor')->name('monitor');
 
 });
 
-Route::group(['prefix' => 'ajtarragona/jobs','middleware' => ['web','language','tjobs-backend'],'as'=>'tgn-jobs.'	], function () {
+Route::group(['prefix' => 'ajtarragona/batches','middleware' => ['web','language','tbatches-backend'],'as'=>'tgn-batches.'	], function () {
 
-    Route::get('/', 'Ajtarragona\TJobs\Controllers\TJobsBackendController@home')->name('home');
+    Route::get('/', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@home')->name('home');
     
 });

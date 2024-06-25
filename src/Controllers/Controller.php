@@ -1,6 +1,6 @@
 <?php
 
-namespace Ajtarragona\TJobs\Controllers;
+namespace Ajtarragona\TBatches\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

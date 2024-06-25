@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTJobsTable extends Migration
+class CreateTBatchesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class CreateTJobsTable extends Migration
     public function up()
     {
 		// Create table for storing types
-        Schema::create('tjobs', function (Blueprint $table) {
+        Schema::create('batches', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('queue');
             $table->string('classname');
@@ -42,7 +42,7 @@ class CreateTJobsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tjobs');
+        Schema::dropIfExists('batches');
         
     }
 }

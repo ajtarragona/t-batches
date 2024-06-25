@@ -14,8 +14,8 @@ _d = function(...args) {
 
 
 document.addEventListener('alpine:init', () => {
-    Alpine.data('jobProgress', (config) => ({
-        job_id: config.job_id,
+    Alpine.data('batchProgress', (config) => ({
+        batch_id: config.batch_id,
         interval: 2000,
         url: config.url,
         progress: config.progress,
@@ -24,12 +24,12 @@ document.addEventListener('alpine:init', () => {
         finished: config.finished,
         init() {
             var o = this;
-            // _d('init Progressbar', o.job_id);
+            // _d('init Progressbar', o.batch_id);
 
             
 
             /* Timer loop ----------------------------------------*/
-            let job, origin = new Date().getTime(), i = 0;
+            let batch, origin = new Date().getTime(), i = 0;
             const timer = () => {
                 if (new Date().getTime() - i > origin){
                     i = i + o.interval;
@@ -48,8 +48,8 @@ document.addEventListener('alpine:init', () => {
                             })
                     }
 
-                    job = requestAnimationFrame(timer)
-                } else if (job !== null){
+                    batch = requestAnimationFrame(timer)
+                } else if (batch !== null){
                     requestAnimationFrame(timer)    
                 }
             }
@@ -57,7 +57,7 @@ document.addEventListener('alpine:init', () => {
             /* Start looping or start again ------------------------*/
             requestAnimationFrame(timer)
             // Stop the loop
-            // job = null
+            // batch = null
         }
     }));
 });

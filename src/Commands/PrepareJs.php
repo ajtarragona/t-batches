@@ -1,6 +1,6 @@
 <?php
 
-namespace Ajtarragona\TJobs\Commands;
+namespace Ajtarragona\TBatches\Commands;
 
 use Illuminate\Console\Command;
 
@@ -15,7 +15,7 @@ class PrepareJs extends Command
      *
      * @var string
      */
-    protected $signature = 'ajtarragona:tjobs:prepare';
+    protected $signature = 'ajtarragona:tbatches:prepare';
 
     /**
      * The console command description.
@@ -47,7 +47,7 @@ class PrepareJs extends Command
     {
    
         $this->line("Publishing assets ...");
-        Artisan::call('vendor:publish',['--tag'=>'tgn-jobs-assets','--force'=>true]);
+        Artisan::call('vendor:publish',['--tag'=>'tgn-tbatches-assets','--force'=>true]);
 
         
     }
