@@ -3,11 +3,14 @@
 namespace Ajtarragona\TBatches\Examples;
 
 use Ajtarragona\TBatches\Models\TBatch;
+use Ajtarragona\TBatches\Traits\SingleThreadedBatch;
 
-class ExampleBatch extends TBatch{
+class ExampleSingleThreadBatch extends TBatch{
+
+    use SingleThreadedBatch;
 
     protected $queue = "example-queue";
-    protected $name = "example-batch";
+    protected $name = "example-single-batch";
     
     protected $things;
     
@@ -27,7 +30,7 @@ class ExampleBatch extends TBatch{
 
         $this->addJob(new ExampleJob(),['weight'=>20,'wait'=>10]);
 
-
+        // dd($this->getJobs());
 
     }
 

@@ -1,16 +1,16 @@
 <?php
 
-namespace Ajtarragona\TJobs\Facades; 
+namespace Ajtarragona\TBatches\Facades; 
 
 use Illuminate\Support\Facades\Facade;
 
-class TJobsFacade extends Facade
+class TBatchesFacade extends Facade
 {
     /**
      * {@inheritdoc}
      */
     protected static function getFacadeAccessor()
     {
-        return 'tgn-jobs';
+        return 'tgn-batches';
     }
 }

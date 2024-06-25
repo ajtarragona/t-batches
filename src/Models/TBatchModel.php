@@ -2,6 +2,7 @@
 
 namespace Ajtarragona\TBatches\Models;
 
+use Ajtarragona\TBatches\Jobs\TBatchJob;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Date;
@@ -101,5 +102,9 @@ class TBatchModel extends Model
 
     }
 
+
+    public function jobs(){
+        return $this->hasMany(TJobModel::class, "batch_id","id");
+    }
 
 }

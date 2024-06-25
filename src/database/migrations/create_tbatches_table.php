@@ -32,6 +32,22 @@ class CreateTBatchesTable extends Migration
 
 
         });
+
+        Schema::create('batch_jobs', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger("batch_id");
+            $table->string('classname');
+            $table->string('name');
+            $table->double('weight')->nullable();
+            $table->double('wait')->nullable();
+            $table->string('message')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('finished_at')->nullable();
+            $table->unsignedTinyInteger('failed')->nullable();
+            $table->text('trace')->nullable();
+            $table->foreign('batch_id')->references('id')->on('batches')->onUpdate('cascade')->onDelete('cascade');
+
+        });
       
     }
 
@@ -42,6 +58,7 @@ class CreateTBatchesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('batch_jobs');
         Schema::dropIfExists('batches');
         
     }

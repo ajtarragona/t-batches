@@ -14,16 +14,16 @@ class TBatchDispatcher implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $tjob;
+    protected $batch;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($tjob)
+    public function __construct($batch)
     {
-        $this->tjob= $tjob;
-        // dd($this->tjob);
+        $this->batch = $batch;
+        // dump($this->batch);
     }
 
    
@@ -36,38 +36,23 @@ class TBatchDispatcher implements ShouldQueue
     {
         
         // dd($this);
-        // dump($this->tjob, $this->tjob->getSteps());
         try{
-            $progress=0;
-            $error=false;
-            $steps=$this->tjob->getSteps();
-            // dd($steps);
-            $model=$this->tjob->getModel();
+            $jobs=$this->batch->getJobs();
+            // dd('TBatchDispatcher handle',$jobs);
+            $model=$this->batch->getModel();
             // dd($model);
 
             $model->update([
                 'progress'=>0,
                 'started_at'=>Date::now(),
             ]);
-
-            foreach( $steps as $i=>$step){
-                $progress = $progress + $step->weight;
-                if($step->run()){
-                    $model->update([
-                        'progress'=>$progress
-                    ]);
-                }else{
-                    $error=true;
-                    $model->update([
-                        'failed'=>true,
-                        'finished_at'=>Date::now(),
-                        'trace'=>"Error in step ". $i
-                    ]);
-                    break;
-                }
-                
+            // dump($jobs);
+            foreach( $jobs as $i=>$job){
+                $success=$job->dispatchNow($job->getModel(),$job->getOptions());
+                if(!$success) break;
             }
-            if(!$error){
+
+            if($success){
                 $model->update([
                     'progress'=>100,
                     'finished_at'=>Date::now(),

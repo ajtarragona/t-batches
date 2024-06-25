@@ -1,15 +1,14 @@
 <?php
 
-namespace Ajtarragona\TJobs\Examples;
+namespace Ajtarragona\TBatches\Examples;
 
-use Ajtarragona\TJobs\Models\TBatch;
-use Ajtarragona\TJobs\Models\TJob;
+use Ajtarragona\TBatches\Jobs\TBatchJob;
 
-class ExampleJob extends TJob{
+class ExampleJob extends TBatchJob{
 
-    public function handle(){
+    public function run(){
         $num=rand(1,100) ;
         // dump($num);
-        return $num <99;
+        return true;//$num <99;
     }
 }

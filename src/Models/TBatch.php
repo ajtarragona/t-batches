@@ -3,6 +3,7 @@
 namespace Ajtarragona\TBatches\Models;
 
 use Ajtarragona\TBatches\Jobs\TBatchDispatcher;
+use Ajtarragona\TBatches\Jobs\TBatchJob;
 use Exception;
 
 use Illuminate\Support\Str;
@@ -41,8 +42,19 @@ abstract class TBatch
     }
 
     public function addJob($job, $args=[]){
-        if($job instanceof TJob) $this->jobs[]=$job;
-        else if(is_callable($job)) $this->jobs[]=new TJob($job, $args);
+        // if(is_callable($job) ){
+        //     if(!$this->isSingleThreaded()) throw new Exception("No callable jobs allowed for multi thread batches");
+        //     $tmp=new TBatchJob();
+        //     // $tmp->setCallable($job);
+        //     $tmp->setBatch($this);
+        //     $tmp->setOptions($args);
+        //     $this->jobs[]=$tmp;
+
+        // }else{
+            // $job->setBatch($this);
+            $job->setOptions($args);
+            $this->jobs[]=$job;
+        // }
 
         return $this;
     }
@@ -50,36 +62,45 @@ abstract class TBatch
 
    
 
-    protected function prepareWeights(){
+    protected function createJobs(){
         $usedweight=0;
         $numwithnoweight=0;
         
-        // dd($this->steps);
+        // dd($this->jobs);
         
         foreach($this->jobs as $job){
-            $usedweight += $job->weight;
-            if($job->weight==0) $numwithnoweight++;
+            $usedweight += $job->weight();
+            if($job->weight()==0) $numwithnoweight++;
         }
         //si la suma es mayor que 100, devuelvo una excepcion
         if($usedweight>100) throw new Exception("Total Weight exceeds 100%");
 
         //recoorro los que no tengan peso y les pongo lo que queda
-        $stepweight=(100-$usedweight)/$numwithnoweight;
+        $jobweight=(100-$usedweight)/$numwithnoweight;
         // dd($stepweight);
         $totalweight=0;
 
         foreach($this->jobs as $i=>$job){
-            if($job->weight==0) $this->jobs[$i]->weight=$stepweight;
+            if($job->weight()==0) $this->jobs[$i]->weight($jobweight);
 
-            $totalweight += $this->jobs[$i]->weight;
+            $totalweight += $this->jobs[$i]->weight();
+
         }
         // dd($this->steps);
         
         if( ceil($totalweight) < 100) throw new Exception("Total weight must be equal to 100%");
 
+        foreach($this->jobs as $i=>$job){
+            $job->createModel($this->model);
+        }
+
     }
 
     
+    public function isSingleThreaded(){
+       return  uses_trait($this, 'Ajtarragona\TBatches\Traits\SingleThreadedBatch' );
+    }
+
     public function run(){
         // lo creo en BBDD
         $this->model=TBatchModel::create([
@@ -93,8 +114,53 @@ abstract class TBatch
         
         //lanzo en la cola
         if($this->jobs){
-            $this->prepareWeights();
-            TBatchDispatcher::dispatch($this)->onQueue($this->queue);
+            $this->createJobs();
+
+            if($this->isSingleThreaded()){
+                // dd($this->getJobs());
+                TBatchDispatcher::dispatch($this)->onQueue($this->queue);
+
+            }else{
+               
+                    
+                $jobs=$this->getJobs();
+                // dd($jobs);
+                //    $progress=0;
+                //     $this->model->update([
+                //         'progress'=>0,
+                //         'started_at'=>Date::now(),
+                //     ]);
+        
+                    foreach( $jobs as $i=>$job){
+                        $job->dispatch()->onQueue($this->queue);
+                    }
+                //         $progress = $progress + $job->weight;
+
+                //         if($job->run()){
+                //             $this->model->update([
+                //                 'progress'=>$progress
+                //             ]);
+                //         }else{
+                //             $error=true;
+                //             $this->model->update([
+                //                 'failed'=>true,
+                //                 'finished_at'=>Date::now(),
+                //                 'trace'=>"Error in job ". $i
+                //             ]);
+                //             break;
+                //         }
+                        
+                //     }
+                //     if(!$error){
+                //         $model->update([
+                //             'progress'=>100,
+                //             'finished_at'=>Date::now(),
+                //         ]);
+                //     }
+                    
+        
+               
+            }
 
         }
     }
