@@ -1,20 +1,34 @@
 <?php
 
 use Ajtarragona\TBatches\Facades\TBatchesFacade;
+use Ajtarragona\TBatches\Models\TBatchModel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 if (! function_exists('tBatchProgress')) {
-	function tBatchProgress($job) {
-		if(!$job instanceof $job){
-			$job=TBatchesFacade::find($job);
+	function tBatchProgress($batch) {
+		if(!$batch instanceof TBatchModel){
+			$batch=TBatchesFacade::find($batch);
 		}
+		// dd($batch);
         // dump($this->options["map_position"]);
-        $view='tgn-jobs::_job-progress';
-
+        $view='tgn-batches::_batch-progress';
 		if(view()->exists($view)){
-            return view($view, ['job'=>$job]);
+            return view($view, ['batch'=>$batch]);
+		}
+    }
+}
+if (! function_exists('tBatchJobDetail')) {
+	function tBatchJobDetail($batch) {
+		if(!$batch instanceof TBatchModel){
+			$batch=TBatchesFacade::find($batch);
+		}
+		// dd($batch);
+        // dump($this->options["map_position"]);
+        $view='tgn-batches::_batch-detail';
+		if(view()->exists($view)){
+            return view($view, ['batch'=>$batch]);
 		}
     }
 }

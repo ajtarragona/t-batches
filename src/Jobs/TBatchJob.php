@@ -3,75 +3,98 @@
 namespace Ajtarragona\TBatches\Jobs;
 
 use Ajtarragona\TBatches\Models\TJobModel;
+use Ajtarragona\TBatches\Traits\BatchableJob;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Str;
+
 
 class TBatchJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, BatchableJob  ;
 
-    protected $job_model;
-    protected $weight;
-    protected $wait;
+    protected $name;
+    
+    public $jobId;
+    public $weight;
+    public $wait;
+    public $stop_on_fail;
 
-    public function __construct(TJobModel $job_model=null, $args=[]){
+    // public function __construct($args=[]){
 
-        $this->job_model = $job_model;
-        if(isset($args["wait"])) $this->wait = intval($args["wait"]);
-        if(isset($args["weight"])) $this->weight = floatval($args["weight"]);
+    //     if(isset($args["wait"])) $this->wait = intval($args["wait"]);
+    //     if(isset($args["weight"])) $this->weight = floatval($args["weight"]);
+    // }
+
+ 
+    public function model(){
+        return TJobModel::find($this->jobId);
     }
 
  
-    public function getModel(){
-        return $this->job_model;
-    }
 
-    public function weight($value=null){
-        if(is_null($value)) return $this->weight;
-        else $this->weight=$value;
-    }
-    
-    public function wait($value=null){
-        if(is_null($value)) return $this->wait;
-        else $this->wait=$value;
-    }
-
-    public function getOptions(){
-        return [
-            'weight'=>$this->weight,
-            'wait'=>$this->wait,
-        ];
-    }
-
-
-    public function createModel($batch){
-        // dump('createModel', $batch);
-        $classname=get_class($this);
-        $name= Str::slug(Str::snake($classname));
-        $args=[
-            'batch_id'=>$batch->id,
-            'classname'=>$classname,
-            'name'=>$name,
-            'wait'=>$this->wait,
-            'weight'=>$this->weight
-        ];
-        // dd($args);
-        $this->job_model=TJobModel::create($args);
-    }
     
 
-    public function setOptions($args=[]){
-        if(isset($args["wait"])) $this->wait = intval($args["wait"]);
-        if(isset($args["weight"])) $this->weight = floatval($args["weight"]);
-    }
-
+  
    
+
+    /** 
+     * Run the job in the batch
+     * without using queues
+     */
+    public function process()
+    {
+        // dump('process',$this->getAttributes());   
+        $success=false;
+        try{
+            $job_model=$this->model(); //job model
+            $batch_model=$this->batch(); //batch model
+
+            //si el batch ha fallado, no hago nada
+            if($this->stop_on_fail && $batch_model->failed) return false;
+
+            //si el batch no se ha iniciado lo inicio
+            if(!$batch_model->started_at) $batch_model->start()->progress(0)->save();
+
+            //inicio el job
+            $job_model->start()->save();
+        
+
+            //si hay wait espero
+            if($this->wait) sleep($this->wait);
+
+
+            //acción especifica del job
+            if(method_exists($this,'run')){
+                $success=$this->run();//lo implementará cada job
+            }
+            
+            
+            if($success){
+                $batch_model->increment('progress', $this->weight); //nativo de laravel, ya guarda
+                $job_model->finish()->save();
+            }else{
+                $job_model->fail()->finish()->save();
+                $batch_model->fail()->finish($this->stop_on_fail)->addTrace("Error in job ". $job_model->id)->save();
+                
+            }
+            
+            return $success;
+
+
+
+        }catch(Exception $e){
+            // dd($e);
+            $job_model->fail()->finish()->addTrace($e->getTrace())->save();
+            $batch_model->fail()->finish($this->stop_on_fail)->addTrace($e->getTrace())->save();
+
+            return false;
+        
+        }
+    }
 
     /**
      * Execute the job.
@@ -80,58 +103,37 @@ class TBatchJob implements ShouldQueue
      */
     public function handle()
     {
+        return $this->process();
         
-        // dump('handle',$this);
-        $success=false;
-        try{
-            $job_model=$this->job_model; //job model
-            $batch=$job_model->batch;
-
-            $job_model->update([
-                'started_at'=>Date::now()
-            ]);
-           
-            if(method_exists($this,'run')){
-                $success=$this->run();//lo implementará cada job
-            }
-            
-            if($success){
-                $batch->increment('progress', $this->weight);
-                $job_model->update([
-                    'finished_at'=>Date::now()
-                ]);
-            }else{
-                $job_model->update([
-                    'failed'=>true,
-                    'finished_at'=>Date::now(),
-                    'message'=>'TODO error message'
-                ]);
-                $batch->update([
-                    'failed'=>true,
-                    'finished_at'=>Date::now(),
-                    'trace'=>"Error in job ". $job_model->id
-                ]);
-            }
-
-            return $success;
+    }
 
 
+    public function error($msg){
+        $job_model=$this->model(); //job model
+        $job_model->message=$msg;
+        $job_model->failed=true;
+        $job_model->save();
+        return false;
+    }
 
-        }catch(Exception $e){
-            // dd($e);
-            $job_model->update([
-                'failed'=>true,
-                'finished_at'=>Date::now(),
-                'trace'=>$e->getTraceAsString()
-            ]);
-            $batch->update([
-                'failed'=>true,
-                'finished_at'=>Date::now(),
-                'trace'=>$e->getTraceAsString()
-            ]);
-            return false;
-           
-        }
+    
+    public function success($msg){
+        $job_model=$this->model(); //job model
+        $job_model->message=$msg;
+        $job_model->save();
+        return true;
+    }
+
+    public function message($msg){
+        
+        return $this->success($msg);
+    }
+
+    public function download($path){
+        $job_model=$this->model(); //job model
+        $job_model->file_url=$path;
+        $job_model->save();
+        return true;
     }
 
     // public function run();

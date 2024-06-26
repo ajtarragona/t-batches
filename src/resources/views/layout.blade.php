@@ -38,6 +38,7 @@
         </div>
 
         @yield('pre-js')
+        <script src="{{ asset('vendor/ajtarragona/js/bootstrap.js')}}" language="JavaScript"></script>
         <script src="{{ asset('vendor/ajtarragona/js/tbatches.js')}}" language="JavaScript"></script>
         @yield('js')
         

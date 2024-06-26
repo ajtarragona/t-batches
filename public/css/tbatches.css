@@ -22071,3 +22071,8 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+.table-text-sm td,
+.table-text-sm th {
+  font-size: 0.8em;
+}
+

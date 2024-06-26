@@ -16,6 +16,7 @@ Route::group(['prefix' => 'ajtarragona/batches','middleware' => ['web','language
     Route::post('/login', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@dologin')->name('dologin');
     Route::get('/logout', 'Ajtarragona\TBatches\Controllers\TBatchesBackendController@logout')->name('logout');
     Route::get('/monitor/{batch}', 'Ajtarragona\TBatches\Controllers\TBatchesController@monitor')->name('monitor');
+    Route::get('/download/{filename}', 'Ajtarragona\TBatches\Controllers\TBatchesController@download')->name('download')->where('filename', '(.*)');
 
 });
 

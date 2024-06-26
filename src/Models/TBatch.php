@@ -2,7 +2,9 @@
 
 namespace Ajtarragona\TBatches\Models;
 
+use Ajtarragona\TBatches\Jobs\CallableJob;
 use Ajtarragona\TBatches\Jobs\TBatchDispatcher;
+use Ajtarragona\TBatches\Jobs\TBatchFinisher;
 use Ajtarragona\TBatches\Jobs\TBatchJob;
 use Exception;
 
@@ -16,9 +18,11 @@ abstract class TBatch
     protected $name;
     protected $classname;
     protected $queue = "batches-queue";
-    protected $model;
+    protected $batchId;
+    // protected $model;
     protected $autostart=true;
-
+    protected $stop_on_fail=false;
+    
 
     // abstract protected function setup();
 
@@ -34,27 +38,42 @@ abstract class TBatch
         return data_get($this->options, $name, $default);
     }
 
-    public function getJobs(){
+    public function jobs(){
         return $this->jobs;
     }
-    public function getModel(){
-        return $this->model;
+    public function model(){
+        return $this->batchId ? TBatchModel::find($this->batchId) : null;
     }
 
-    public function addJob($job, $args=[]){
-        // if(is_callable($job) ){
-        //     if(!$this->isSingleThreaded()) throw new Exception("No callable jobs allowed for multi thread batches");
-        //     $tmp=new TBatchJob();
-        //     // $tmp->setCallable($job);
-        //     $tmp->setBatch($this);
-        //     $tmp->setOptions($args);
-        //     $this->jobs[]=$tmp;
+    
 
-        // }else{
+    public function stopsOnFail(){
+        return $this->stop_on_fail;
+    }
+
+
+    public function add($job, $args=[]){
+        return $this->addJob($job,$args);
+    }
+    public function addJob($job, $args=[]){
+        if(is_callable($job) ){
+            if(!$this->isSingleThreaded()) throw new Exception("No callable jobs allowed for multi thread batches");
+            $tmp=new CallableJob($job);
+            // $tmp->setCallable($job);
+            $tmp->stop_on_fail = $args["stop_on_fail"] ?? $this->stop_on_fail;
+            $tmp->wait = $args["wait"]??0;
+            $tmp->weight = $args["weight"]??0;
+
+            $this->jobs[]=$tmp;
+
+        }else{
             // $job->setBatch($this);
-            $job->setOptions($args);
+            $job->stop_on_fail = $args["stop_on_fail"] ?? $this->stop_on_fail;
+            $job->wait = $args["wait"]??0;
+            $job->weight = $args["weight"]??0;
+
             $this->jobs[]=$job;
-        // }
+        }
 
         return $this;
     }
@@ -62,15 +81,19 @@ abstract class TBatch
 
    
 
-    protected function createJobs(){
+    /**
+     * Asigna pesos a cada job 
+     * crea los jobs en bbdd
+     */
+    protected function prepareJobs(){
         $usedweight=0;
         $numwithnoweight=0;
         
         // dd($this->jobs);
         
         foreach($this->jobs as $job){
-            $usedweight += $job->weight();
-            if($job->weight()==0) $numwithnoweight++;
+            $usedweight += $job->weight;
+            if($job->weight==0) $numwithnoweight++;
         }
         //si la suma es mayor que 100, devuelvo una excepcion
         if($usedweight>100) throw new Exception("Total Weight exceeds 100%");
@@ -81,9 +104,9 @@ abstract class TBatch
         $totalweight=0;
 
         foreach($this->jobs as $i=>$job){
-            if($job->weight()==0) $this->jobs[$i]->weight($jobweight);
+            if($job->weight==0) $this->jobs[$i]->weight = $jobweight;
 
-            $totalweight += $this->jobs[$i]->weight();
+            $totalweight += $this->jobs[$i]->weight;
 
         }
         // dd($this->steps);
@@ -91,7 +114,7 @@ abstract class TBatch
         if( ceil($totalweight) < 100) throw new Exception("Total weight must be equal to 100%");
 
         foreach($this->jobs as $i=>$job){
-            $job->createModel($this->model);
+            $job->withBatch($this)->createModel();
         }
 
     }
@@ -103,60 +126,40 @@ abstract class TBatch
 
     public function run(){
         // lo creo en BBDD
-        $this->model=TBatchModel::create([
+        $model=TBatchModel::create([
             'queue'=>$this->queue,
             'classname'=>$this->classname,
             'name'=>$this->name,
+            'stop_on_fail'=>$this->stopsOnFail(),
             'user_id'=>auth()->user()?auth()->user()->id:null,
             'progress'=>0
         ]);
+        $this->batchId=$model->id;
 
         
         //lanzo en la cola
         if($this->jobs){
-            $this->createJobs();
 
+            $this->prepareJobs();
+            
             if($this->isSingleThreaded()){
-                // dd($this->getJobs());
+                // dd($this->jobs());
                 TBatchDispatcher::dispatch($this)->onQueue($this->queue);
 
             }else{
                
-                    
-                $jobs=$this->getJobs();
-                // dd($jobs);
-                //    $progress=0;
-                //     $this->model->update([
-                //         'progress'=>0,
-                //         'started_at'=>Date::now(),
-                //     ]);
-        
-                    foreach( $jobs as $i=>$job){
-                        $job->dispatch()->onQueue($this->queue);
-                    }
-                //         $progress = $progress + $job->weight;
+            
+                //despacho todos los jobs a la cola definida en el batch
+                //cuando se lance el primer job se marcará la fecha de inicio del batch. 
+                //así, la cola no está arrancada, el batch no avanzará
+                foreach( $this->jobs as $i=>$job){
+                    dispatch($job)->onQueue($this->queue);
+                }
 
-                //         if($job->run()){
-                //             $this->model->update([
-                //                 'progress'=>$progress
-                //             ]);
-                //         }else{
-                //             $error=true;
-                //             $this->model->update([
-                //                 'failed'=>true,
-                //                 'finished_at'=>Date::now(),
-                //                 'trace'=>"Error in job ". $i
-                //             ]);
-                //             break;
-                //         }
-                        
-                //     }
-                //     if(!$error){
-                //         $model->update([
-                //             'progress'=>100,
-                //             'finished_at'=>Date::now(),
-                //         ]);
-                //     }
+                //lanzo un job de finalizacion de la batch, en la misma cola
+                TBatchFinisher::dispatch($this)->onQueue($this->queue);
+
+
                     
         
                
@@ -164,5 +167,8 @@ abstract class TBatch
 
         }
     }
+
+
+
 
 }

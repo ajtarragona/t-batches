@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -99,8 +99,6 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-// import * as bootstrap from 'bootstrap'
-
 _d = function _d() {
   var _console;
   for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -116,18 +114,21 @@ _d = function _d() {
   (_console = console).log.apply(_console, _toConsumableArray(args));
 };
 document.addEventListener('alpine:init', function () {
-  Alpine.data('batchProgress', function (config) {
+  Alpine.data('batchDetail', function (config) {
+    var _config$stop_on_fail;
     return {
       batch_id: config.batch_id,
       interval: 2000,
       url: config.url,
       progress: config.progress,
+      stop_on_fail: (_config$stop_on_fail = config.stop_on_fail) !== null && _config$stop_on_fail !== void 0 ? _config$stop_on_fail : false,
       failed: config.failed,
       started: config.started,
       finished: config.finished,
+      jobs: [],
       init: function init() {
         var o = this;
-        // _d('init Progressbar', o.batch_id);
+        _d('init batchDetail', o.batch_id);
 
         /* Timer loop ----------------------------------------*/
         var batch,
@@ -136,16 +137,73 @@ document.addEventListener('alpine:init', function () {
         var timer = function timer() {
           if (new Date().getTime() - i > origin) {
             i = i + o.interval;
-            if (o.started && !o.failed && o.progress < 100) {
+            if (o.started && !o.finished) {
+              //(!o.failed ||!o.stop_on_fail) && o.progress<100){
+              console.log("Fetching jobs...");
+              fetch(o.url).then(function (response) {
+                return response.json();
+              }).then(function (data) {
+                // _d(data,o);
+                o.jobs = data.jobs;
+                o.failed = data.failed;
+                o.started = data.started;
+                o.finished = data.finished;
+
+                // _d(o);
+                // Parse response
+              });
+            }
+            batch = requestAnimationFrame(timer);
+          } else if (batch !== null) {
+            requestAnimationFrame(timer);
+          }
+        };
+
+        /* Start looping or start again ------------------------*/
+        requestAnimationFrame(timer);
+        // Stop the loop
+        // batch = null
+      }
+    };
+  });
+  Alpine.data('batchProgress', function (config) {
+    var _config$stop_on_fail2;
+    return {
+      batch_id: config.batch_id,
+      interval: 2000,
+      url: config.url,
+      progress: config.progress,
+      stop_on_fail: (_config$stop_on_fail2 = config.stop_on_fail) !== null && _config$stop_on_fail2 !== void 0 ? _config$stop_on_fail2 : false,
+      failed: config.failed,
+      started: config.started,
+      finished: config.finished,
+      init: function init() {
+        var o = this;
+        _d('init Progressbar', o.batch_id);
+
+        /* Timer loop ----------------------------------------*/
+        var batch,
+          origin = new Date().getTime(),
+          i = 0;
+        var timer = function timer() {
+          if (new Date().getTime() - i > origin) {
+            i = i + o.interval;
+            if (o.started && !o.finished) {
+              //(!o.failed ||!o.stop_on_fail) && o.progress<100){
               console.log("Fetching updates...", o.started, o.progress);
               fetch(o.url).then(function (response) {
                 return response.json();
               }).then(function (data) {
+                var _data$file_url;
                 // _d(data,o);
                 o.progress = data.progress;
                 o.failed = data.failed;
                 o.started = data.started;
                 o.finished = data.finished;
+                if ((_data$file_url = data.file_url) !== null && _data$file_url !== void 0 ? _data$file_url : null) {
+                  _d('o.file_url', data.file_url);
+                  window.location.href = data.file_url;
+                }
                 // _d(o);
                 // Parse response
               });
@@ -167,26 +225,14 @@ document.addEventListener('alpine:init', function () {
 
 /***/ }),
 
-/***/ "./src/resources/sass/tbatches.scss":
-/*!******************************************!*\
-  !*** ./src/resources/sass/tbatches.scss ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
-/***/ 0:
-/*!*******************************************************************************!*\
-  !*** multi ./src/resources/js/tbatches.js ./src/resources/sass/tbatches.scss ***!
-  \*******************************************************************************/
+/***/ 1:
+/*!********************************************!*\
+  !*** multi ./src/resources/js/tbatches.js ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\js\tbatches.js */"./src/resources/js/tbatches.js");
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\sass\tbatches.scss */"./src/resources/sass/tbatches.scss");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\js\tbatches.js */"./src/resources/js/tbatches.js");
 
 
 /***/ })

@@ -3,23 +3,26 @@
 namespace Ajtarragona\TBatches\Models;
 
 use Ajtarragona\TBatches\Jobs\TBatchJob;
+use Ajtarragona\TBatches\Traits\TraceableModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Date;
 
 class TBatchModel extends Model
 {
+    use TraceableModel;
+    
     public $table = 'batches';
 
 	public static $perpage = 10;
    
     public $sortable = [
-   		'id','name','classname','queue','user_id','progress','description','progress','created_at','started_at','finished_at','failed','trace'
+   		'id','name','classname','queue','user_id','progress','description','progress','created_at','started_at','finished_at','failed','stop_on_fail','trace'
     ];
 
 
    	protected $fillable = [
-        'name','classname','queue','user_id','progress','description','created_at','started_at','finished_at','failed','trace'
+        'name','classname','queue','user_id','progress','description','created_at','started_at','finished_at','failed','stop_on_fail','trace'
 	];
 
     public $timestamps = false;
@@ -30,6 +33,8 @@ class TBatchModel extends Model
 
     protected $casts = [
         'failed' => 'boolean',
+        'stop_on_fail'=>'boolean',
+        'trace' => 'array',
     ];
 
 	public function user()
@@ -103,8 +108,25 @@ class TBatchModel extends Model
     }
 
 
+    public function startedJobs(){
+        return $this->jobs()->started();
+    }
     public function jobs(){
         return $this->hasMany(TJobModel::class, "batch_id","id");
+    }
+    
+    public function lastFinishedJob(){
+        return $this->jobs()->finished()->orderBy('finished_at','desc')->first();
+    }
+
+    public function progress($progress=0){
+        $this->progress=$progress;
+        $this->save();
+        return $this;
+    }
+
+    public function getProgressAttribute($value){
+        return round($value,2);
     }
 
 }

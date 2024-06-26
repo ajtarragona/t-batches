@@ -7,3 +7,8 @@ body{
     font-family: system-ui, sans-serif ; 
     // "System", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
+
+.table-text-sm td,
+.table-text-sm th{
+    font-size:.8em;
+}

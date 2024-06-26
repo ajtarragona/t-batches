@@ -26,6 +26,7 @@ class CreateTBatchesTable extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->unsignedTinyInteger('failed')->nullable();
+            $table->unsignedTinyInteger('stop_on_fail')->nullable();
             $table->text('trace')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
@@ -40,6 +41,7 @@ class CreateTBatchesTable extends Migration
             $table->string('name');
             $table->double('weight')->nullable();
             $table->double('wait')->nullable();
+            $table->string('file_url')->nullable();
             $table->string('message')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();

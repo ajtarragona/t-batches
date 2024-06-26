@@ -35,38 +35,29 @@ class TBatchDispatcher implements ShouldQueue
     public function handle()
     {
         
-        // dd($this);
+        
         try{
-            $jobs=$this->batch->getJobs();
+            $jobs=$this->batch->jobs();
             // dd('TBatchDispatcher handle',$jobs);
-            $model=$this->batch->getModel();
+            $batch_model=$this->batch->model();
             // dd($model);
 
-            $model->update([
-                'progress'=>0,
-                'started_at'=>Date::now(),
-            ]);
+            $batch_model->start()->progress(0)->save();
             // dump($jobs);
             foreach( $jobs as $i=>$job){
-                $success=$job->dispatchNow($job->getModel(),$job->getOptions());
-                if(!$success) break;
+                $success=$job->process();
+               
+                if(!$success && $job->stop_on_fail) break;
             }
 
-            if($success){
-                $model->update([
-                    'progress'=>100,
-                    'finished_at'=>Date::now(),
-                ]);
+            if($success || !$batch_model->stop_on_fail){
+                $batch_model->progress(100)->finish()->save();
             }
             
 
         }catch(Exception $e){
             // dd($e);
-            $model->update([
-                'failed'=>true,
-                'finished_at'=>Date::now(),
-                'trace'=>$e->getTraceAsString()
-            ]);
+            $batch_model->fail()->finish()->addTrace($e->getTrace())->save();
 
             // dd($e);
             // abort(500,$e->getMessage());

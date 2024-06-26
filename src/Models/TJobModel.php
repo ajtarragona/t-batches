@@ -2,21 +2,23 @@
 
 namespace Ajtarragona\TBatches\Models;
 
+use Ajtarragona\TBatches\Traits\TraceableModel;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Date;
 
 class TJobModel extends Model
 {
+    use TraceableModel;
+    
     public $table = 'batch_jobs';
 
 	
     public $sortable = [
-   		'id','name','classname','batch_id','message','started_at','finished_at','failed','trace','wait','weight'
+   		'id','name','classname','batch_id','message','file_url','started_at','finished_at','failed','trace','wait','weight'
     ];
 
 
    	protected $fillable = [
-        'name','classname','batch_id','message','started_at','finished_at','failed','trace','wait','weight'
+        'name','classname','batch_id','message','file_url','started_at','finished_at','failed','trace','wait','weight'
 	];
 
     public $timestamps = false;
@@ -27,6 +29,7 @@ class TJobModel extends Model
 
     protected $casts = [
         'failed' => 'boolean',
+        'trace' => 'array',
     ];
 
 	public function batch()
@@ -64,18 +67,6 @@ class TJobModel extends Model
         $query->where('batch_id',$batch_id);
     }
 
-
- 
-
-    // protected static function boot() 
-    // {
-    //     parent::boot();
-        
-    //     static::creating(function($record) { 
-    //        $record->started_at = Date::now();
-    //     });
-
-    // }
-
+  
 
 }

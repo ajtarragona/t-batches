@@ -12,25 +12,28 @@ class ExampleSingleThreadBatch extends TBatch{
     protected $queue = "example-queue";
     protected $name = "example-single-batch";
     
-    protected $things;
+    public $counter=0; // accessible from jobs
+    
+    protected $stop_on_fail=false;
+    
     
     public function __construct($numsteps=0, $options=[]) {
         parent::__construct($options);
         // $this->numsteps=$numsteps;
 
-        $this->addJob(new ExampleJob(), ['weight'=>10]);
-
+        $this->add(new ExampleJob('inici'), ['weight'=>10,'wait'=>5]);
+      
 
        if($numsteps>0){
             for($i=0; $i<$numsteps ; $i++){
-                $this->addJob(new ExampleJob(),['wait'=>1]);
+                $this->add(new ExampleJob('task '.$i),['wait'=>1]);
         
             }
         }
 
-        $this->addJob(new ExampleJob(),['weight'=>20,'wait'=>10]);
+        $this->add(new ExampleJob('final'),['weight'=>20,'wait'=>5]);
 
-        // dd($this->getJobs());
+        // dd($this->jobs());
 
     }
 
