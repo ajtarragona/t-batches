@@ -49,8 +49,11 @@ class TBatchDispatcher implements ShouldQueue
                
                 if(!$success && $job->stop_on_fail) break;
             }
-
-            if($success || !$batch_model->stop_on_fail){
+            $batch_model=$this->batch->model();
+            
+            // dump($success, $batch_model->stop_on_fail, $batch_model->finished_at);
+            if(($success || !$batch_model->stop_on_fail) && !$batch_model->finished_at){
+                // dd("entro");
                 $batch_model->progress(100)->finish()->save();
             }
             

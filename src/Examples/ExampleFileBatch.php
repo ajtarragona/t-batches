@@ -9,7 +9,7 @@ class ExampleFileBatch extends TBatch{
 
     use SingleThreadedBatch;
 
-    protected $queue = "example-queue";
+    protected $queue = "example-file-queue";
     protected $name = "example-file-batch";
     
     public $counter=0; // accessible from jobs

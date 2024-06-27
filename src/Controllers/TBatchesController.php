@@ -37,6 +37,14 @@ class TBatchesController extends Controller
 
     }
     
+    public function cancel(TBatchModel $batch){
+        
+        $batch->finish()->save();
+
+        return response()->json(["status"=>"success"]);
+    
+    }
+    
 
     
 }

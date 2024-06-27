@@ -1,13 +1,13 @@
 
 <div x-data="batchProgress({
-    batch_id: {{$batch->id}},
-    url: '{{ route('tgn-batches.monitor',['batch'=>$batch->id])}}',
-    cancel_url: '{{ route('tgn-batches.cancel',['batch'=>$batch->id])}}',
-    progress: {{$batch->progress??0}},
-    stop_on_fail: {{$batch->stop_on_fail?'true':'false'}},
-    failed: {{$batch->failed?'true':'false'}},
-    started: {{$batch->started_at?'true':'false'}},
-    finished: {{$batch->finished_at?'true':'false'}},
+    batch_id: batch.id,
+    url: '/ajtarragona/batches/monitor/'+batch.id,
+    cancel_url: '/ajtarragona/batches/cancel/'+batch.id,
+    progress: batch.progress,
+    stop_on_fail: batch.stop_on_fail,
+    failed: batch.failed,
+    started: batch.started_at?true:false,
+    finished: batch.finished_at?true:false,
     height: '{{ $height??'25px'}}'
 })">
 

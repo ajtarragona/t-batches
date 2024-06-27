@@ -55,6 +55,9 @@ class TBatchJob implements ShouldQueue
 
             //si el batch ha fallado, no hago nada
             if($this->stop_on_fail && $batch_model->failed) return false;
+            
+            //si el batch está finalizado no hago nada (si cancelan)
+            if($batch_model->finished_at) return false;
 
             //si el batch no se ha iniciado lo inicio
             if(!$batch_model->started_at) $batch_model->start()->progress(0)->save();

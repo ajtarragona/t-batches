@@ -7577,6 +7577,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/resources/sass/tbatches-backend.scss":
+/*!**************************************************!*\
+  !*** ./src/resources/sass/tbatches-backend.scss ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "./src/resources/sass/tbatches.scss":
 /*!******************************************!*\
   !*** ./src/resources/sass/tbatches.scss ***!
@@ -7589,13 +7600,14 @@ __webpack_require__.r(__webpack_exports__);
 /***/ }),
 
 /***/ 0:
-/*!********************************************************************************!*\
-  !*** multi ./src/resources/js/bootstrap.js ./src/resources/sass/tbatches.scss ***!
-  \********************************************************************************/
+/*!***************************************************************************************************************************!*\
+  !*** multi ./src/resources/js/bootstrap.js ./src/resources/sass/tbatches-backend.scss ./src/resources/sass/tbatches.scss ***!
+  \***************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\js\bootstrap.js */"./src/resources/js/bootstrap.js");
+__webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\sass\tbatches-backend.scss */"./src/resources/sass/tbatches-backend.scss");
 module.exports = __webpack_require__(/*! C:\xampp\htdocs\laravel\packages\ajtarragona\t-batches\src\resources\sass\tbatches.scss */"./src/resources/sass/tbatches.scss");
 
 

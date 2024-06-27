@@ -38,7 +38,8 @@ class TBatchFinisher implements ShouldQueue
         // dd($this->batch->stopsOnFail(), $batch_model->failed);
         if($batch_model->failed && $this->batch->stopsOnFail() ){
             $batch_model->finish()->save();
-        }else{
+        }else if(!$batch_model->finished_at){
+            //si ya tiene fecha final quiere decir que lo han cancelado
             $batch_model->finish()->progress(100)->save();
         }
         

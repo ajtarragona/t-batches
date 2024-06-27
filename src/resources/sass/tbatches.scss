@@ -1,14 +1,12 @@
-@import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons';
-
-// @import url("https://fonts.googleapis.com/css?family=Montserrat:100,400,500,800");
-
-body{
-    font-family: system-ui, sans-serif ; 
-    // "System", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
-
-.table-text-sm td,
-.table-text-sm th{
-    font-size:.8em;
+.batch-progress{
+    .cancel-btn{
+        position:absolute;
+        right:0;
+        top:0;
+        margin-right:5px;
+        opacity:0;
+    }
+    &:hover .cancel-btn{
+        opacity:1;
+    }
 }

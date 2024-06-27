@@ -71,6 +71,9 @@ class TBatchModel extends Model
     public function scopeOfUser($query, $user_id){
         $query->where('user_id',$user_id);
     }
+    public function scopeOfQueue($query, $queue){
+        $query->where('queue',$queue);
+    }
 
 
     
@@ -80,11 +83,14 @@ class TBatchModel extends Model
         if(!$filter) return;
 
        
-        if($filter['user_id']){
+        if($filter['queue']??null){
+            $query->ofQueue($filter['queue']);
+        }
+        if($filter['user_id']??null){
             $query->ofUser($filter['user_id']);
         }
 
-        if($filter["term"]){
+        if($filter["term"]??null){
             $textfilter=$filter["term"];
             $query->where(function ($query) use ($textfilter) {
                 $query->where('name', 'like','%'.$textfilter.'%')

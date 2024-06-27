@@ -1,5 +1,7 @@
 {
     "/public/js/bootstrap.js": "/public/js/bootstrap.js",
+    "/public/css/tbatches-backend.css": "/public/css/tbatches-backend.css",
     "/public/css/tbatches.css": "/public/css/tbatches.css",
-    "/public/js/tbatches.js": "/public/js/tbatches.js"
+    "/public/js/tbatches.js": "/public/js/tbatches.js",
+    "/public/js/tbatches-backend.js": "/public/js/tbatches-backend.js"
 }

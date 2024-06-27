@@ -2,6 +2,7 @@
 
 namespace Ajtarragona\TBatches\Controllers;
 
+use Ajtarragona\TBatches\Models\TBatchModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use TBatches;
@@ -33,11 +34,20 @@ class TBatchesBackendController extends Controller
     public function home(){
         
         Artisan::call('vendor:publish',['--tag'=>'tgn-batches-assets','--force'=>true]);
-        $batches=TBatches::all();
-        $args=compact('batches');
+        // $batches=TBatches::all();
+        $args=[];//compact('batches');
         
         return view("tgn-batches::welcome", $args);
     }
 
+
+    
+    public function batches(Request $request){
+
+        $batches=TBatchModel::filter($request->all())->get();
+        $args=compact('batches');
+        return response()->json($args);
+        
+    }
     
 }
