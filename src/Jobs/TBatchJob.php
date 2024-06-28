@@ -67,7 +67,14 @@ class TBatchJob implements ShouldQueue
         
 
             //si hay wait espero
-            if($this->wait) sleep($this->wait);
+            if($this->wait){
+                if($this->wait<1){
+                    // dd($this->wait*1000000);
+                    usleep($this->wait*1000000);
+                }else{
+                    sleep($this->wait);
+                }
+            }
 
 
             //acción especifica del job

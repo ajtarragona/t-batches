@@ -52,10 +52,16 @@ class TBatchModel extends Model
     public function scopeStarted($query){
         $query->whereNotNull('started_at');
     }
+    public function scopePending($query){
+        $query->whereNull('started_at');
+    }
     
 
     public function scopeFinished($query){
         $query->whereNotNull('finished_at');
+    }
+    public function scopeRunning($query){
+        $query->started()->whereNull('finished_at');
     }
 
     
@@ -74,6 +80,10 @@ class TBatchModel extends Model
     public function scopeOfQueue($query, $queue){
         $query->where('queue',$queue);
     }
+    public function scopewithStatus($query, $status){
+         $query->$status();
+        // if($status=="running") $query->running();
+    }
 
 
     
@@ -83,6 +93,15 @@ class TBatchModel extends Model
         if(!$filter) return;
 
        
+        if($filter['from_date']??null){
+            $query->whereDate('created_at','>=',$filter['from_date']);
+        }
+        if($filter['until_date']??null){
+            $query->whereDate('created_at','<=',$filter['until_date']);
+        }
+        if($filter['status']??null){
+            $query->withStatus($filter['status']);
+        }
         if($filter['queue']??null){
             $query->ofQueue($filter['queue']);
         }
@@ -98,6 +117,7 @@ class TBatchModel extends Model
             });
         }
 
+        // dump(fullquery($query));
     }
 
 

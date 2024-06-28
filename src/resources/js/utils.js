@@ -10,6 +10,15 @@ _d = function(...args) {
     console.log(...args);
 }
 
+baseUrl = function() {
+    const urlTag =  document.head.querySelector('meta[name="base-url"]');
+    if (urlTag) {
+        return urlTag.content
+    }
+
+    return window.livewire_url ?? undefined
+}
+
 getCsrfToken= function() {
     const tokenTag = document.head.querySelector('meta[name="csrf-token"]')
 

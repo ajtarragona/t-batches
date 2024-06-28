@@ -4,10 +4,10 @@ namespace Ajtarragona\TBatches\Examples;
 
 use Ajtarragona\TBatches\Models\TBatch;
 
-class ExampleBatch extends TBatch{
+class ExampleBatchWithErrors extends TBatch{
 
     protected $queue = "example-queue";
-    protected $name = "example-batch";
+    protected $name = "example-batch-errors";
     
     public $counter=0; //not accessible from jobs
     
@@ -23,7 +23,7 @@ class ExampleBatch extends TBatch{
 
        if($numsteps>0){
             for($i=0; $i<$numsteps ; $i++){
-                $this->add(new ExampleJob("Pas ".$i),['wait'=>1]);
+                $this->add(new ExampleJobWithErrors("Pas ".$i),['wait'=>1]);
         
             }
         }

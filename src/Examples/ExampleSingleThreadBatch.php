@@ -21,7 +21,7 @@ class ExampleSingleThreadBatch extends TBatch{
         parent::__construct($options);
         // $this->numsteps=$numsteps;
 
-        $this->add(new ExampleJob('inici'), ['weight'=>10,'wait'=>5]);
+        $this->add(new ExampleJob('inici'), ['weight'=>10,'wait'=>0]);
       
 
        if($numsteps>0){

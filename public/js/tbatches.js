@@ -103,136 +103,175 @@ function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 
 document.addEventListener('alpine:init', function () {
-  Alpine.data('batchDetail', function (config) {
-    var _config$stop_on_fail;
+  Alpine.data('batchProgress', function (config) {
+    var _config$batch_id, _config$batch, _config$height;
     return {
-      batch_id: config.batch_id,
+      batch_id: (_config$batch_id = config.batch_id) !== null && _config$batch_id !== void 0 ? _config$batch_id : null,
+      batch: (_config$batch = config.batch) !== null && _config$batch !== void 0 ? _config$batch : null,
       interval: 2000,
-      url: config.url,
-      progress: config.progress,
-      stop_on_fail: (_config$stop_on_fail = config.stop_on_fail) !== null && _config$stop_on_fail !== void 0 ? _config$stop_on_fail : false,
-      failed: config.failed,
-      started: config.started,
-      finished: config.finished,
+      url_prefix: '/ajtarragona/batches',
+      the_url: null,
+      showDetail: false,
       jobs: [],
-      fetchJobs: function fetchJobs() {
+      // cancel_url: config.cancel_url,
+      // progress: config.progress,
+      // stop_on_fail: config.stop_on_fail??false,
+      // failed: config.failed,
+      // started: config.started,
+      // finished: config.finished,
+      height: (_config$height = config.height) !== null && _config$height !== void 0 ? _config$height : '25px',
+      init: function init() {
         var _this = this;
         return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-          var o;
+          var _o$batch$jobs;
+          var o, batch, origin, i, timer;
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
-                o = _this;
-                console.log("Fetching jobs...");
-                fetch(o.url).then(function (response) {
-                  return response.json();
-                }).then(function (data) {
-                  // _d(data,o);
-                  o.jobs = data.jobs;
-                  o.failed = data.failed;
-                  o.started = data.started;
-                  o.finished = data.finished;
+                o = _this; // _d('init batch');
+                if (!(o.batch && !o.batch_id)) {
+                  _context.next = 6;
+                  break;
+                }
+                o.batch_id = o.batch.id;
+                o.the_url = baseUrl() + o.url_prefix + '/batch/' + o.batch_id;
 
-                  // _d(o);
-                  // Parse response
-                });
-              case 3:
+                // _d(o.batch);
+                _context.next = 10;
+                break;
+              case 6:
+                if (!(o.batch_id && !o.batch)) {
+                  _context.next = 10;
+                  break;
+                }
+                o.the_url = baseUrl() + o.url_prefix + '/batch/' + o.batch_id;
+
+                // _d('from ID ' +o.batch_id);
+                //recupero el batch
+                _context.next = 10;
+                return o.fetchBatch();
+              case 10:
+                if (o.batch) {
+                  _context.next = 12;
+                  break;
+                }
+                return _context.abrupt("return");
+              case 12:
+                o.jobs = (_o$batch$jobs = o.batch.jobs) !== null && _o$batch$jobs !== void 0 ? _o$batch$jobs : [];
+
+                // _d('init Progressbar', o.batch_id);
+
+                // _d(o.url, o.batch);
+                // return;
+
+                /* Timer loop ----------------------------------------*/
+                origin = new Date().getTime(), i = 0;
+                timer = function timer() {
+                  if (new Date().getTime() - i > origin) {
+                    i = i + o.interval;
+                    if (!o.batch.finished_at) {
+                      //(!o.failed ||!o.stop_on_fail) && o.progress<100){
+                      o.fetchBatch();
+                    }
+                    batch = requestAnimationFrame(timer);
+                  } else if (batch !== null) {
+                    requestAnimationFrame(timer);
+                  }
+                };
+                /* Start looping or start again ------------------------*/
+                requestAnimationFrame(timer);
+                // Stop the loop
+                // batch = null
+              case 16:
               case "end":
                 return _context.stop();
             }
           }, _callee);
         }))();
       },
-      init: function init() {
-        var o = this;
-        _d('init batchDetail', o.batch_id);
-        o.fetchJobs();
-
-        /* Timer loop ----------------------------------------*/
-        var batch,
-          origin = new Date().getTime(),
-          i = 0;
-        var timer = function timer() {
-          if (new Date().getTime() - i > origin) {
-            i = i + o.interval;
-            if (o.started && !o.finished) {
-              //(!o.failed ||!o.stop_on_fail) && o.progress<100){
-              o.fetchJobs();
+      fetchBatch: function fetchBatch() {
+        var _this2 = this;
+        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+          var o;
+          return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+            while (1) switch (_context2.prev = _context2.next) {
+              case 0:
+                o = _this2;
+                console.log("Fetching updates...", o.batch_id);
+                _context2.next = 4;
+                return fetch(o.the_url).then(function (response) {
+                  return response.json();
+                }).then(function (data) {
+                  var _data$file_url;
+                  // _d(data);
+                  o.batch = data.batch;
+                  o.jobs = data.jobs;
+                  if ((_data$file_url = data.file_url) !== null && _data$file_url !== void 0 ? _data$file_url : null) {
+                    // _d('o.file_url',data.file_url);
+                    window.location.href = data.file_url;
+                  }
+                  if (o.showDetail) {
+                    o.stickToBottom();
+                  }
+                  // _d(o);
+                  // Parse response
+                });
+              case 4:
+              case "end":
+                return _context2.stop();
             }
-            batch = requestAnimationFrame(timer);
-          } else if (batch !== null) {
-            requestAnimationFrame(timer);
-          }
-        };
+          }, _callee2);
+        }))();
+      },
+      setBatch: function setBatch(batch_id) {
+        var _this3 = this;
+        return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+          var o;
+          return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+            while (1) switch (_context3.prev = _context3.next) {
+              case 0:
+                o = _this3;
+                _this3.batch_id = batch_id;
+                _this3.the_url = baseUrl() + _this3.url_prefix + '/batch/' + _this3.batch_id;
 
-        /* Start looping or start again ------------------------*/
-        requestAnimationFrame(timer);
-        // Stop the loop
-        // batch = null
-      }
-    };
-  });
-  Alpine.data('batchProgress', function (config) {
-    var _config$stop_on_fail2, _config$height;
-    return {
-      batch_id: config.batch_id,
-      interval: 2000,
-      url: config.url,
-      cancel_url: config.cancel_url,
-      progress: config.progress,
-      stop_on_fail: (_config$stop_on_fail2 = config.stop_on_fail) !== null && _config$stop_on_fail2 !== void 0 ? _config$stop_on_fail2 : false,
-      failed: config.failed,
-      started: config.started,
-      finished: config.finished,
-      height: (_config$height = config.height) !== null && _config$height !== void 0 ? _config$height : '25px',
-      init: function init() {
-        var o = this;
-        _d('init Progressbar', o.batch_id);
-
-        /* Timer loop ----------------------------------------*/
-        var batch,
-          origin = new Date().getTime(),
-          i = 0;
-        var timer = function timer() {
-          if (new Date().getTime() - i > origin) {
-            i = i + o.interval;
-            if (o.started && !o.finished) {
-              //(!o.failed ||!o.stop_on_fail) && o.progress<100){
-              console.log("Fetching updates...", o.started, o.progress);
-              fetch(o.url).then(function (response) {
-                return response.json();
-              }).then(function (data) {
-                var _data$file_url;
-                // _d(data,o);
-                o.progress = data.progress;
-                o.failed = data.failed;
-                o.started = data.started;
-                o.finished = data.finished;
-                if ((_data$file_url = data.file_url) !== null && _data$file_url !== void 0 ? _data$file_url : null) {
-                  _d('o.file_url', data.file_url);
-                  window.location.href = data.file_url;
-                }
-                // _d(o);
-                // Parse response
-              });
+                // _d('from ID ' +o.batch_id);
+                //recupero el batch
+                _context3.next = 5;
+                return o.fetchBatch();
+              case 5:
+              case "end":
+                return _context3.stop();
             }
-            batch = requestAnimationFrame(timer);
-          } else if (batch !== null) {
-            requestAnimationFrame(timer);
-          }
-        };
+          }, _callee3);
+        }))();
+      },
+      stickToBottom: function stickToBottom() {
+        var o = this;
+        o.$nextTick(function () {
+          // setTimeout(()=>{
+          var container = o.$refs['batchDetail'];
+          var h = container.scrollHeight;
+          // _d(container, h);
+          container.scrollTo(0, h);
+        });
+      },
+      toggleDetails: function toggleDetails() {
+        var o = this;
 
-        /* Start looping or start again ------------------------*/
-        requestAnimationFrame(timer);
-        // Stop the loop
-        // batch = null
+        // _d('toggleDetails',this.showDetail);
+        this.showDetail = !this.showDetail;
+        if (this.showDetail) {
+          // setTimeout(()=>{
+          //     o.stickToBottom();
+          // },50);
+        }
       },
       cancel: function cancel() {
         var o = this;
         var data = {
           _token: getCsrfToken()
         };
-        fetch(o.cancel_url, {
+        fetch(o.the_url + '/cancel', {
           method: 'POST',
           body: JSON.stringify(data),
           headers: {
@@ -279,6 +318,14 @@ _d = function _d() {
     return Alpine.raw(arg);
   });
   (_console = console).log.apply(_console, _toConsumableArray(args));
+};
+baseUrl = function baseUrl() {
+  var _window$livewire_url;
+  var urlTag = document.head.querySelector('meta[name="base-url"]');
+  if (urlTag) {
+    return urlTag.content;
+  }
+  return (_window$livewire_url = window.livewire_url) !== null && _window$livewire_url !== void 0 ? _window$livewire_url : undefined;
 };
 getCsrfToken = function getCsrfToken() {
   var _window$livewire_toke;

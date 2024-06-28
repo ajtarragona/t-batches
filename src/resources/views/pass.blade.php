@@ -6,7 +6,7 @@
 
         <title>TGN Batches</title>
 
-        <link href="{{ asset('vendor/ajtarragona/css/tbatches.css') }}" rel="stylesheet">
+        <link href="{{ asset('vendor/ajtarragona/css/tbatches-backend.css') }}" rel="stylesheet">
 
     </head>
     <body class="bg-secondary h-100">

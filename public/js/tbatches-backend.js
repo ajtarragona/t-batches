@@ -118,23 +118,29 @@ document.addEventListener('alpine:init', function () {
     return {
       batches: [],
       queues: [],
-      url: config.url,
+      url_prefix: '/ajtarragona/batches',
+      url: null,
+      loading: true,
+      firstloading: true,
       filter: {
         queue: null,
-        term: null
+        term: null,
+        status: null,
+        from_date: null,
+        until_date: null
       },
-      fetchBatches: function fetchBatches() {
+      fetchBatches: function fetchBatches(first) {
         var _this = this;
         return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
           var o, params;
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
-                o = _this;
-                console.log("Fetching batches...");
+                o = _this; // console.log("Fetching batches...");
                 params = _objectSpread(_objectSpread({}, o.filter), {}, {
                   _token: getCsrfToken()
                 }); // _d(params);
+                o.loading = true;
                 fetch(o.url, {
                   method: 'post',
                   body: JSON.stringify(params),
@@ -147,9 +153,15 @@ document.addEventListener('alpine:init', function () {
                   return response.json();
                 }).then(function (data) {
                   o.batches = data.batches;
-                  o.queues = o.batches.map(function (batch) {
+                  // _d(o.batches);
+                  o.loading = false;
+                  o.firstloading = false;
+
+                  //añade las posibles nuevas colas
+                  var queues = o.batches.map(function (batch) {
                     return batch.queue;
                   });
+                  o.queues = [].concat(_toConsumableArray(o.queues), _toConsumableArray(queues));
                   o.queues = _toConsumableArray(new Set(o.queues));
                 });
               case 4:
@@ -162,7 +174,9 @@ document.addEventListener('alpine:init', function () {
       init: function init() {
         var o = this;
         _d('init batches');
-        o.fetchBatches();
+        o.url = baseUrl() + o.url_prefix;
+        // _d(o.url);
+        o.fetchBatches(true);
         this.$watch('filter', function (values) {
           console.log('filter changed', values);
           o.fetchBatches();
@@ -172,6 +186,77 @@ document.addEventListener('alpine:init', function () {
       },
       refresh: function refresh() {
         this.fetchBatches();
+      },
+      removeAll: function removeAll() {
+        var o = this;
+        var params = {
+          _token: getCsrfToken()
+        };
+        var url = o.url;
+        fetch(url, {
+          method: 'delete',
+          body: JSON.stringify(params),
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          o.refresh();
+        });
+      },
+      remove: function remove(batch_id) {
+        // _d('delete',batch_id);
+        var o = this;
+        var params = {
+          _token: getCsrfToken()
+        };
+        var url = o.url + '/batch/' + batch_id;
+        fetch(url, {
+          method: 'delete',
+          body: JSON.stringify(params),
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          var index = o.batches.findIndex(function (batch) {
+            return batch.id === batch_id;
+          });
+          // _d(index);
+          o.batches.splice(index, 1);
+        });
+      },
+      launchTest: function launchTest(name) {
+        var o = this;
+        var params = {
+          name: name,
+          _token: getCsrfToken()
+        };
+        // _d('test',params);
+        o.loading = true;
+        fetch(o.url + '/batch/test', {
+          method: 'post',
+          body: JSON.stringify(params),
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        }).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          // _d(data);
+          o.$dispatch('batchadded', {
+            batch: data.batch
+          });
+          o.refresh();
+        });
       }
     };
   });
@@ -205,6 +290,14 @@ _d = function _d() {
     return Alpine.raw(arg);
   });
   (_console = console).log.apply(_console, _toConsumableArray(args));
+};
+baseUrl = function baseUrl() {
+  var _window$livewire_url;
+  var urlTag = document.head.querySelector('meta[name="base-url"]');
+  if (urlTag) {
+    return urlTag.content;
+  }
+  return (_window$livewire_url = window.livewire_url) !== null && _window$livewire_url !== void 0 ? _window$livewire_url : undefined;
 };
 getCsrfToken = function getCsrfToken() {
   var _window$livewire_toke;

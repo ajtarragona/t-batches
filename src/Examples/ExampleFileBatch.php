@@ -24,11 +24,11 @@ class ExampleFileBatch extends TBatch{
 
        if($lines>0){
             for($i=0; $i < $lines ; $i++){
-                $this->add(new ExampleFileJob(),['wait'=>1]);
+                $this->add(new ExampleFileJob(),['wait'=>0.5]);
             }
         }
       
-        $this->add(new ExampleFileJobEnd(),['wait'=>5]);
+        $this->add(new ExampleFileJobEnd(),['wait'=>2]);
         
       
 

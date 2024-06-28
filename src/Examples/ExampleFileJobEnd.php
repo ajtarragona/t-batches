@@ -18,7 +18,7 @@ class ExampleFileJobEnd extends TBatchJob{
         // dump($filename, $this->batch->filecontent);
         Storage::disk('local')->put($filename, $this->batch->filecontent);
         // =storage_path('app/'.$filename);
-        $fileurl=route('tgn-batches.download',['filename'=>$filename]);
+        $fileurl=route('tgn-batches.download',[ 'filename'=>$filename]);
         // dump($fileurl);
         $this->message("Generated file ".$filename);
         return $this->download( $fileurl );

@@ -95,3 +95,11 @@ if (!function_exists('json_alpine')) {
 		return str_replace("\"","'", json_encode( $ret, JSON_HEX_APOS|JSON_HEX_QUOT ));
 	}
 }
+
+
+if (! function_exists('fullquery')) {
+
+	function fullquery($query){
+		return vsprintf(str_replace(array('?'), array('\'%s\''), $query->toSql()), $query->getBindings());
+	}
+}

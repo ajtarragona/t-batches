@@ -61,9 +61,7 @@ class TBatchesServiceProvider extends ServiceProvider
          Blade::directive('tBatchProgress',  function ($expression) {
             return "<?php echo tBatchProgress({$expression}); ?>";
         });
-         Blade::directive('tBatchJobDetail',  function ($expression) {
-            return "<?php echo tBatchJobDetail({$expression}); ?>";
-        });
+         
     }
 
     public function registerCommands()

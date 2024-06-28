@@ -13,12 +13,13 @@ class TBatchesController extends Controller
 
     public function monitor(TBatchModel $batch, Request $request){
         $lastJob=$batch->lastFinishedJob();
-
+        // dd($batch);
         $ret=[
-            'progress'=>$batch->progress,
-            'failed'=>$batch->failed?1:0,
-            'started'=>$batch->started_at?1:0,
-            'finished'=>$batch->finished_at?1:0,
+            'batch'=>$batch,
+        //     'progress'=>$batch->progress,
+        //     'failed'=>$batch->failed?1:0,
+        //     'started'=>$batch->started_at?1:0,
+        //     'finished'=>$batch->finished_at?1:0,
             'message'=>$lastJob->message??null,
             'file_url'=>$lastJob->file_url??null,
             'jobs'=>$batch->startedJobs
