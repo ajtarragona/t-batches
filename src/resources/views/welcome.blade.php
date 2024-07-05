@@ -68,11 +68,15 @@
 
 
 					<div class="mt-3">
-						Last batch
-
-						<div  x-data="batchProgress({
+						{{-- Last batch
+						@if($test_batch??null)
+							@tBatchProgress($test_batch->id,['id'=>'last-batch-progress','hideOnFinish'=>true])
+						@endif --}}
+						
+						{{-- <div  x-data="batchProgress({
 								batch_id: {{$test_batch->id}},
-								height:'60px'
+								
+								
 							})"
 							@batchadded.window="setBatch($event.detail.batch.id)"
 						>
@@ -86,7 +90,7 @@
 									</div>
 								</div>
 							</template>
-						</div>
+						</div> --}}
 					
 					</div>
 						
@@ -136,6 +140,7 @@
 									<th>Finished</th>
 									{{-- <th>Class</th> --}}
 									<th>Queue</th>
+									<th>#Jobs</th>
 									{{-- <th>User</th> --}}
 									<th>&nbsp;</th>
 									<th>&nbsp;</th>
@@ -146,7 +151,7 @@
 								<template x-for="batch in batches" :key="batch.id">
 									<tbody x-data="batchProgress({
 										batch: batch,
-										height: '{{ $height??'25px'}}'
+										height: '{{ $height??'31px'}}'
 									})">
 										<tr >
 											<td style="width:40px;" x-text="batch.id"></td>
@@ -156,6 +161,7 @@
 											<td class="text-truncate" style="width:120px;"><small class="text-muted" x-text="batch.finished_at"></small></td>
 
 											<td class="text-truncate"><span class="badge bg-dark text-bg-dark"><i class="bi bi-gear-wide"></i> <span x-text="batch.queue"></span></span></td>
+											<td ><span x-text="batch.total"></span></td>
 											{{-- <td x-text="batch.user_id"></td> --}}
 											<td>
 												<i class="bi bi-exclamation-circle-fill text-danger" x-cloak x-show="batch.finished_at && batch.failed  "></i>
@@ -216,7 +222,7 @@
 																		
 
 																	</td>
-																	<td style="width:50px" class=""><span  x-text="index+1"></span>/<span  x-text="jobs.length"></span></td>
+																	<td style="width:50px" class=""><span  x-text="index+1"></span>/<span  x-text="batch.total"></span></td>
 																	<td style="width:40px" class="" x-text="job.id"></td>
 																	<td style="width:120px" class=" text-truncate" x-text="job.name"></td>
 																	<td style="width:120px" class=" text-truncate"><small class="text-muted" x-text="job.started_at"></small></td>

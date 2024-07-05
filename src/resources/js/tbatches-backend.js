@@ -15,7 +15,6 @@ document.addEventListener('alpine:init', () => {
             status:null,
             from_date:null,
             until_date:null,
-
         },
         async fetchBatches(first) {
             var o = this;

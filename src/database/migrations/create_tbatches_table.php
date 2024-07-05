@@ -21,7 +21,7 @@ class CreateTBatchesTable extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->double('progress')->nullable();
-            $table->unsignedBigInteger("user_id")->nullable();
+            $table->unsignedInteger("user_id")->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();

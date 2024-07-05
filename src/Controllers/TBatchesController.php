@@ -14,6 +14,8 @@ class TBatchesController extends Controller
     public function monitor(TBatchModel $batch, Request $request){
         $lastJob=$batch->lastFinishedJob();
         // dd($batch);
+        $batch->total=$batch->jobs->count();
+        
         $ret=[
             'batch'=>$batch,
         //     'progress'=>$batch->progress,

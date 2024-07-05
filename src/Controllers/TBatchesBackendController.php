@@ -48,6 +48,10 @@ class TBatchesBackendController extends Controller
     public function batches(Request $request){
 
         $batches=TBatchModel::filter($request->all())->with(['jobs'])->get();
+        foreach($batches as $i=>$batch){
+            $batches[$i]->total=$batch->jobs->count();
+        }
+
         $args=compact('batches');
         return response()->json($args);
         

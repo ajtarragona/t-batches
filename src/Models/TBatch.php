@@ -166,6 +166,7 @@ abstract class TBatch
             }
 
         }
+        return $model;
     }
 
 

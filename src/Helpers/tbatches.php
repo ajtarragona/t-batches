@@ -7,31 +7,22 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 if (! function_exists('tBatchProgress')) {
-	function tBatchProgress($batch) {
-		if(!$batch instanceof TBatchModel){
-			$batch=TBatchesFacade::find($batch);
-		}
-		// dd($batch);
-        // dump($this->options["map_position"]);
+	function tBatchProgress($batch, $options=[]) {
+		// dd($batch, $options);
+		// dd(array_merge(['batch_id'=>$batch],$options));
+
         $view='tgn-batches::_batch-progress';
+		// dump( $view, view()->exists($view), $batch);
 		if(view()->exists($view)){
-            return view($view, ['batch'=>$batch]);
+			if($batch instanceof TBatchModel){
+				return view($view, array_merge(['batch_id'=>$batch->id],$options));
+			}else{
+				return view($view, array_merge(['batch_id'=>$batch],$options));
+			}
 		}
     }
 }
-if (! function_exists('tBatchJobDetail')) {
-	function tBatchJobDetail($batch) {
-		if(!$batch instanceof TBatchModel){
-			$batch=TBatchesFacade::find($batch);
-		}
-		// dd($batch);
-        // dump($this->options["map_position"]);
-        $view='tgn-batches::_batch-detail';
-		if(view()->exists($view)){
-            return view($view, ['batch'=>$batch]);
-		}
-    }
-}
+ 
 
 if (! function_exists('c')) {
 	function c($name) {

@@ -5,12 +5,16 @@ document.addEventListener('alpine:init', () => {
     
 
     Alpine.data('batchProgress', (config) => ({
+        id:config.id??null,
         batch_id: config.batch_id??null,
         batch: config.batch??null,
         interval: 2000,
         url_prefix: '/ajtarragona/batches',
         the_url: null,
         showDetail:false,
+        hidden:false,
+        hideOnFinish:config.hideOnFinish??false,
+        hideDelay:config.hideDelay??1000,
         jobs:[],
         // cancel_url: config.cancel_url,
         // progress: config.progress,
@@ -18,11 +22,11 @@ document.addEventListener('alpine:init', () => {
         // failed: config.failed,
         // started: config.started,
         // finished: config.finished,
-        height: config.height??'25px',
+        height: config.height??'20px',
         
         async init() {
             var o = this;
-            // _d('init batch');
+            _d('init batch', o.hideOnFinish);
             
             if(o.batch && !o.batch_id){
                 o.batch_id=o.batch.id;
@@ -34,7 +38,7 @@ document.addEventListener('alpine:init', () => {
 
                 // _d('from ID ' +o.batch_id);
                 //recupero el batch
-                await o.fetchBatch();
+                await o.fetchBatch(true);
                 // _d('after',o.batch);
             }
 
@@ -57,7 +61,7 @@ document.addEventListener('alpine:init', () => {
                 if (new Date().getTime() - i > origin){
                     i = i + o.interval;
                     if(!o.batch.finished_at){ //(!o.failed ||!o.stop_on_fail) && o.progress<100){
-                        o.fetchBatch();
+                        o.fetchBatch(false);
                     }
 
                     batch = requestAnimationFrame(timer)
@@ -71,7 +75,7 @@ document.addEventListener('alpine:init', () => {
             // Stop the loop
             // batch = null
         },
-        async fetchBatch() {
+        async fetchBatch(first) {
             let o=this;
             console.log("Fetching updates...", o.batch_id);
             await fetch(o.the_url)
@@ -81,6 +85,26 @@ document.addEventListener('alpine:init', () => {
                     o.batch=data.batch;
                     o.jobs=data.jobs;
                     
+                    if(o.hideOnFinish){
+                        if(o.batch.finished_at ){
+                            if(first || !o.hideDelay){
+                                o.hidden=true;
+                            }else{
+                                setTimeout(function(){
+                                    o.hidden=true;
+                                    
+                                }, o.hideDelay );
+                            }
+                        }else{
+                            o.hidden=false;
+                        }
+                    }
+
+                    if(o.batch.finished_at){
+                        // _d('batch finished ',o.batch);
+                        o.$dispatch('batchfinished', {batch:o.batch});
+                    }
+
                     if(data.file_url??null){
                         // _d('o.file_url',data.file_url);
                         window.location.href=data.file_url;
@@ -99,7 +123,7 @@ document.addEventListener('alpine:init', () => {
 
             // _d('from ID ' +o.batch_id);
             //recupero el batch
-            await o.fetchBatch();
+            await o.fetchBatch(true);
         },
         stickToBottom(){
             let o=this;

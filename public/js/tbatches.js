@@ -104,14 +104,18 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 
 document.addEventListener('alpine:init', function () {
   Alpine.data('batchProgress', function (config) {
-    var _config$batch_id, _config$batch, _config$height;
+    var _config$id, _config$batch_id, _config$batch, _config$hideOnFinish, _config$hideDelay, _config$height;
     return {
+      id: (_config$id = config.id) !== null && _config$id !== void 0 ? _config$id : null,
       batch_id: (_config$batch_id = config.batch_id) !== null && _config$batch_id !== void 0 ? _config$batch_id : null,
       batch: (_config$batch = config.batch) !== null && _config$batch !== void 0 ? _config$batch : null,
       interval: 2000,
       url_prefix: '/ajtarragona/batches',
       the_url: null,
       showDetail: false,
+      hidden: false,
+      hideOnFinish: (_config$hideOnFinish = config.hideOnFinish) !== null && _config$hideOnFinish !== void 0 ? _config$hideOnFinish : false,
+      hideDelay: (_config$hideDelay = config.hideDelay) !== null && _config$hideDelay !== void 0 ? _config$hideDelay : 1000,
       jobs: [],
       // cancel_url: config.cancel_url,
       // progress: config.progress,
@@ -119,7 +123,7 @@ document.addEventListener('alpine:init', function () {
       // failed: config.failed,
       // started: config.started,
       // finished: config.finished,
-      height: (_config$height = config.height) !== null && _config$height !== void 0 ? _config$height : '25px',
+      height: (_config$height = config.height) !== null && _config$height !== void 0 ? _config$height : '20px',
       init: function init() {
         var _this = this;
         return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -128,35 +132,36 @@ document.addEventListener('alpine:init', function () {
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
-                o = _this; // _d('init batch');
+                o = _this;
+                _d('init batch', o.hideOnFinish);
                 if (!(o.batch && !o.batch_id)) {
-                  _context.next = 6;
+                  _context.next = 7;
                   break;
                 }
                 o.batch_id = o.batch.id;
                 o.the_url = baseUrl() + o.url_prefix + '/batch/' + o.batch_id;
 
                 // _d(o.batch);
-                _context.next = 10;
+                _context.next = 11;
                 break;
-              case 6:
+              case 7:
                 if (!(o.batch_id && !o.batch)) {
-                  _context.next = 10;
+                  _context.next = 11;
                   break;
                 }
                 o.the_url = baseUrl() + o.url_prefix + '/batch/' + o.batch_id;
 
                 // _d('from ID ' +o.batch_id);
                 //recupero el batch
-                _context.next = 10;
-                return o.fetchBatch();
-              case 10:
+                _context.next = 11;
+                return o.fetchBatch(true);
+              case 11:
                 if (o.batch) {
-                  _context.next = 12;
+                  _context.next = 13;
                   break;
                 }
                 return _context.abrupt("return");
-              case 12:
+              case 13:
                 o.jobs = (_o$batch$jobs = o.batch.jobs) !== null && _o$batch$jobs !== void 0 ? _o$batch$jobs : [];
 
                 // _d('init Progressbar', o.batch_id);
@@ -171,7 +176,7 @@ document.addEventListener('alpine:init', function () {
                     i = i + o.interval;
                     if (!o.batch.finished_at) {
                       //(!o.failed ||!o.stop_on_fail) && o.progress<100){
-                      o.fetchBatch();
+                      o.fetchBatch(false);
                     }
                     batch = requestAnimationFrame(timer);
                   } else if (batch !== null) {
@@ -182,14 +187,14 @@ document.addEventListener('alpine:init', function () {
                 requestAnimationFrame(timer);
                 // Stop the loop
                 // batch = null
-              case 16:
+              case 17:
               case "end":
                 return _context.stop();
             }
           }, _callee);
         }))();
       },
-      fetchBatch: function fetchBatch() {
+      fetchBatch: function fetchBatch(first) {
         var _this2 = this;
         return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
           var o;
@@ -206,6 +211,25 @@ document.addEventListener('alpine:init', function () {
                   // _d(data);
                   o.batch = data.batch;
                   o.jobs = data.jobs;
+                  if (o.hideOnFinish) {
+                    if (o.batch.finished_at) {
+                      if (first || !o.hideDelay) {
+                        o.hidden = true;
+                      } else {
+                        setTimeout(function () {
+                          o.hidden = true;
+                        }, o.hideDelay);
+                      }
+                    } else {
+                      o.hidden = false;
+                    }
+                  }
+                  if (o.batch.finished_at) {
+                    // _d('batch finished ',o.batch);
+                    o.$dispatch('batchfinished', {
+                      batch: o.batch
+                    });
+                  }
                   if ((_data$file_url = data.file_url) !== null && _data$file_url !== void 0 ? _data$file_url : null) {
                     // _d('o.file_url',data.file_url);
                     window.location.href = data.file_url;
@@ -237,7 +261,7 @@ document.addEventListener('alpine:init', function () {
                 // _d('from ID ' +o.batch_id);
                 //recupero el batch
                 _context3.next = 5;
-                return o.fetchBatch();
+                return o.fetchBatch(true);
               case 5:
               case "end":
                 return _context3.stop();
