@@ -1,2 +1,4 @@
-# t-jobs
-Queued monitorable jobs for Laravel
+# t-batches
+Queued monitorable batched jobs for Laravel
+
+
