@@ -18,7 +18,7 @@ abstract class TBatch
     protected $name;
     protected $classname;
     protected $queue = "batches-queue";
-    protected $batchId;
+    public $batchId;
     // protected $model;
     protected $autostart=true;
     protected $stop_on_fail=false;

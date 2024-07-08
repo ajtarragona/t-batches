@@ -31,7 +31,7 @@ trait BatchableJob
     public function withBatch($batch)
     {
         $this->batch = $batch;
-        $this->batchId = $batch->model()->id;
+        $this->batchId = $batch->batchId; //model() ? $batch->model()->id:null;
 
         return $this;
     }
@@ -49,7 +49,7 @@ trait BatchableJob
         ];
         // dd($args);
         $model=TJobModel::create($args);
-        $this->jobId=$model->id;   ;
+        $this->jobId=$model->id;   
         
     }
     
