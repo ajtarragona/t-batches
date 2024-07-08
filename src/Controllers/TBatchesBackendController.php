@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class TBatchesBackendController extends Controller
 {
     public function login(){
-        Artisan::call('vendor:publish',['--tag'=>'tgn-batches-assets','--force'=>true]);
+        // Artisan::call('vendor:publish',['--tag'=>'tgn-batches-assets','--force'=>true]);
         return view("tgn-batches::pass");
     }
 
@@ -35,7 +35,7 @@ class TBatchesBackendController extends Controller
     
     public function home(){
         
-        Artisan::call('vendor:publish',['--tag'=>'tgn-batches-assets','--force'=>true]);
+        // Artisan::call('vendor:publish',['--tag'=>'tgn-batches-assets','--force'=>true]);
         $test_batch=TBatchModel::orderBy('created_at','desc')->first();
         // dd($test_batch)
         $args=compact('test_batch');
